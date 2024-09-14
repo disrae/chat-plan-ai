@@ -1,5 +1,6 @@
 import { ScrollViewStyleReset } from 'expo-router/html';
 import { type PropsWithChildren } from 'react';
+import '../constants/styles.css';
 
 /**
  * This file is web-only and used to configure the root HTML for every web page during static rendering.
@@ -23,7 +24,7 @@ export default function Root({ children }: PropsWithChildren) {
         <style dangerouslySetInnerHTML={{ __html: responsiveBackground }} />
         {/* Add any additional <head> elements that you want globally available on web... */}
       </head>
-      <body>{children}</body>
+      <body className='bg-red-400'>{children}</body>
     </html>
   );
 }
