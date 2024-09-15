@@ -5,22 +5,6 @@ import { View, Text, TextInput, ScrollView, Pressable, Image, SafeAreaView } fro
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { SignUp } from "@/components/modals/SignUp";
 
-const NavLink = ({ title }: { title: string; }) => (
-    <Pressable className="pl-4">
-        <Text className="text-sm font-medium hover:underline underline-offset-4">{title}</Text>
-    </Pressable>
-);
-
-const TestimonialCard = ({ name }: { name: string; }) => (
-    <View className="bg-background rounded-lg p-6 space-y-4">
-        <Text className="font-bold">{name}</Text>
-        <Text className="text-muted-foreground">
-            The Chat App has been a game-changer for our business. The AI-powered summaries have helped us create much more
-            detailed project plans with our customers.
-        </Text>
-    </View>
-);
-
 export default function HomePage() {
     // const isLargeScreen = useMediaQuery({ minWidth: 768 });
     const [modal, setModal] = useState<'' | 'sign-up'>('');
@@ -115,3 +99,19 @@ export default function HomePage() {
         </View>
     );
 }
+
+const NavLink = ({ title }: { title: string; }) => (
+    <Pressable className="pl-4">
+        <Text className="text-sm font-medium hover:underline underline-offset-4">{title}</Text>
+    </Pressable>
+);
+
+const TestimonialCard = ({ name }: { name: string; }) => (
+    <View className="bg-background rounded-lg p-6 space-y-4">
+        <Text className="font-bold">{name}</Text>
+        <Text className="text-muted-foreground">
+            The Chat App has been a game-changer for our business. The AI-powered summaries have helped us create much more
+            detailed project plans with our customers.
+        </Text>
+    </View>
+);

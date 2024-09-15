@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable } from 'react-native';
 import { Popup } from '../utils/Popup';
 import { colors } from '@/constants/Colors';
+import { useAuthActions } from "@convex-dev/auth/react";
 
 type Props = { onClose: () => void; };
 
 export function SignUp({ onClose }: Props) {
+    const { signIn } = useAuthActions();
     const [type, setType] = useState<'login' | 'signup'>('signup');
     const [accountType, setAccountType] = useState<'business' | 'personal'>('business');
     const [businessName, setBusinessName] = useState('');
