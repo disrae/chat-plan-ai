@@ -4,9 +4,12 @@ import { View, Text, TextInput, ScrollView, Pressable, Image, SafeAreaView } fro
 // import { useMediaQuery } from "react-responsive"; // For responsive design with @expo/match-media
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { SignUp } from "@/components/modals/SignUp";
+import { useAuth, useUser } from "@clerk/clerk-expo";
 
 export default function HomePage() {
-    // const isLargeScreen = useMediaQuery({ minWidth: 768 });
+    const { user } = useUser();
+    const { signOut, isSignedIn } = useAuth();
+    console.log(JSON.stringify(user, null, 2));
     const [modal, setModal] = useState<'' | 'sign-up'>('');
 
     return (

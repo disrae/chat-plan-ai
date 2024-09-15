@@ -19,7 +19,7 @@ export function Popup({ onClose, children }: Props) {
                 className="absolute w-full h-full"
             />
             <TouchableWithoutFeedback>
-                <View className="bg-slate-50 rounded-lg w-11/12 max-w-lg z-20 cursor-default">
+                <View className="bg-slate-50 rounded-lg w-11/12 max-w-lg z-20 cursor-default max-h-[80%]">
                     <Pressable className='absolute top-4 right-4 z-20' onPress={onClose}>
                         <Text className="text-lg">✕</Text>
                     </Pressable>

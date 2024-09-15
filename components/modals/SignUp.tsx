@@ -1,40 +1,63 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Pressable } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { View, Text, TextInput, Pressable, ScrollView } from 'react-native';
 import { Popup } from '../utils/Popup';
 import { colors } from '@/constants/Colors';
-import { useAuthActions } from "@convex-dev/auth/react";
+import { useSignIn, useSignUp } from '@clerk/clerk-expo';
+import { useRouter } from 'expo-router';
+import { shadow } from '@/constants/styles';
+
 
 type Props = { onClose: () => void; };
 
 export function SignUp({ onClose }: Props) {
-    const { signIn } = useAuthActions();
+    const router = useRouter();
+    const { isLoaded: isLoadedSignUp, setActive: setActiveSignUp, signUp } = useSignUp();
+    const { isLoaded: isLoadedSignIn, setActive: setActiveSignIn, signIn } = useSignIn();
+    const [pendingVerification, setPendingVerification] = useState(false);
     const [type, setType] = useState<'signIn' | 'signUp'>('signUp');
     const [accountType, setAccountType] = useState<'business' | 'personal'>('business');
     const [businessName, setBusinessName] = useState('');
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
-    // Single field to track which input is focused
     const [focusedField, setFocusedField] = useState<'business-name' | 'name' | 'email' | 'password' | null>(null);
 
-    const toggleAccountType = () => {
-        setAccountType(accountType === 'business' ? 'personal' : 'business');
+    const handleSignUp = async () => {
+        if (!isLoadedSignUp) { return; }
+        try {
+            await signUp.create({ emailAddress: email, password });
+            await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
+            setPendingVerification(true);
+        } catch (err: any) {
+            // See https://clerk.com/docs/custom-flows/error-handling
+            // for more info on error handling
+            console.error(JSON.stringify(err, null, 2));
+        }
     };
 
-    const login = async () => {
-        signIn("password", { email, password, flow: type });
-        onClose();
-    };
+    const handleSignIn = useCallback(async () => {
+        if (!isLoadedSignIn) { return; }
+        try {
+            const signInAttempt = await signIn.create({ identifier: email, password });
 
-    const signUp = async () => {
-        await signIn({ email, password });
-        onClose();
-    };
+            if (signInAttempt.status === 'complete') {
+                await setActiveSignIn({ session: signInAttempt.createdSessionId });
+
+                // Get the user info from convex
+                router.replace('/');
+            } else {
+                // See https://clerk.com/docs/custom-flows/error-handling
+                // for more info on error handling
+                console.error(JSON.stringify(signInAttempt, null, 2));
+            }
+        } catch (err: any) {
+            console.error(JSON.stringify(err, null, 2));
+        }
+    }, [isLoadedSignIn, email, password]);
 
     return (
         <Popup onClose={onClose}>
-            <View className="p-6 max-w-lg rounded-lg">
+            <ScrollView className="p-6 max-w-lg rounded-lg">
                 <View className="flex-row justify-between items-center">
                     <Text className="text-xl font-bold">
                         {type === 'signUp' ? 'Create an Account' : 'Sign In'}
@@ -55,14 +78,7 @@ export function SignUp({ onClose }: Props) {
                                 style={[
                                     accountType === 'business'
                                         ? { backgroundColor: colors.primary.DEFAULT }
-                                        : {
-                                            backgroundColor: 'white',
-                                            shadowColor: '#000',
-                                            shadowOffset: { width: 4, height: 4 },
-                                            shadowOpacity: 0.2,
-                                            shadowRadius: 1,
-                                            elevation: 5,
-                                        },
+                                        : shadow,
                                     { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8 },
                                 ]}
                                 onPress={() => setAccountType('business')}
@@ -73,14 +89,7 @@ export function SignUp({ onClose }: Props) {
                                 style={[
                                     accountType === 'personal'
                                         ? { backgroundColor: colors.primary.DEFAULT }
-                                        : {
-                                            backgroundColor: 'white',
-                                            shadowColor: '#000',
-                                            shadowOffset: { width: 0, height: 2 },
-                                            shadowOpacity: 0.25,
-                                            shadowRadius: 3.84,
-                                            elevation: 5,
-                                        },
+                                        : shadow,
                                     { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8 },
                                 ]}
                                 onPress={() => setAccountType('personal')}
@@ -150,7 +159,7 @@ export function SignUp({ onClose }: Props) {
 
                 <Pressable
                     className="bg-primary py-3 rounded-md mb-4"
-                    onPress={() => (type === 'signIn' ? login() : signUp())}
+                    onPress={type === 'signIn' ? handleSignIn : handleSignUp}
                 >
                     <Text className="text-white text-center text-lg font-medium ">
                         {type === 'signUp' ? 'Sign Up' : 'Sign In'}
@@ -165,7 +174,7 @@ export function SignUp({ onClose }: Props) {
                         {type === 'signUp' ? 'Already have an account? Sign In' : 'Don\'t have an account? Sign Up'}
                     </Text>
                 </Pressable>
-            </View>
+            </ScrollView>
         </Popup>
     );
 }
