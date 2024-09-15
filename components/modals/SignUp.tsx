@@ -8,15 +8,28 @@ type Props = { onClose: () => void; };
 
 export function SignUp({ onClose }: Props) {
     const { signIn } = useAuthActions();
-    const [type, setType] = useState<'login' | 'signup'>('signup');
+    const [type, setType] = useState<'signIn' | 'signUp'>('signUp');
     const [accountType, setAccountType] = useState<'business' | 'personal'>('business');
     const [businessName, setBusinessName] = useState('');
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
+    // Single field to track which input is focused
+    const [focusedField, setFocusedField] = useState<'business-name' | 'name' | 'email' | 'password' | null>(null);
+
     const toggleAccountType = () => {
         setAccountType(accountType === 'business' ? 'personal' : 'business');
+    };
+
+    const login = async () => {
+        signIn("password", { email, password, flow: type });
+        onClose();
+    };
+
+    const signUp = async () => {
+        await signIn({ email, password });
+        onClose();
     };
 
     return (
@@ -24,85 +37,100 @@ export function SignUp({ onClose }: Props) {
             <View className="p-6 max-w-lg rounded-lg">
                 <View className="flex-row justify-between items-center">
                     <Text className="text-xl font-bold">
-                        {type === 'signup' ? 'Create an Account' : 'Sign In'}
+                        {type === 'signUp' ? 'Create an Account' : 'Sign In'}
                     </Text>
                 </View>
 
                 <Text className="text-gray-800 mb-6">
-                    {type === 'signup'
+                    {type === 'signUp'
                         ? 'Sign up to start planning projects with others.'
                         : 'Sign in to continue where you left off.'}
                 </Text>
 
-                {type === 'signup' && <View className="mb-4">
-                    <Text className="text-lg mb-1">Account Type</Text>
-                    <View className='flex-row gap-2'>
-                        <Pressable
-                            style={[
-                                accountType === 'business'
-                                    ? { backgroundColor: colors.primary.DEFAULT }
-                                    : {
-                                        backgroundColor: 'white',
-                                        shadowColor: '#000',
-                                        shadowOffset: { width: 4, height: 4 },
-                                        shadowOpacity: 0.2,
-                                        shadowRadius: 1,
-                                        elevation: 5, // Android shadow
-                                    },
-                                { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8 },
-                            ]}
-                            onPress={() => setAccountType('business')}>
-                            <Text className={`text-md font-medium ${accountType === 'business' ? 'text-white' : ''}`}>Business</Text>
-                        </Pressable>
-                        <Pressable
-                            style={[
-                                accountType === 'personal'
-                                    ? { backgroundColor: colors.primary.DEFAULT }
-                                    : {
-                                        backgroundColor: 'white',
-                                        shadowColor: '#000',
-                                        shadowOffset: { width: 0, height: 2 },
-                                        shadowOpacity: 0.25,
-                                        shadowRadius: 3.84,
-                                        elevation: 5, // Android shadow
-                                    },
-                                { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8 },
-                            ]}
-                            onPress={() => setAccountType('personal')}>
-                            <Text className={`text-md font-medium ${accountType === 'personal' ? 'text-white' : ''}`}>Personal</Text>
-                        </Pressable>
+                {type === 'signUp' && (
+                    <View className="mb-4">
+                        <Text className="text-lg mb-1">Account Type</Text>
+                        <View className="flex-row gap-2">
+                            <Pressable
+                                style={[
+                                    accountType === 'business'
+                                        ? { backgroundColor: colors.primary.DEFAULT }
+                                        : {
+                                            backgroundColor: 'white',
+                                            shadowColor: '#000',
+                                            shadowOffset: { width: 4, height: 4 },
+                                            shadowOpacity: 0.2,
+                                            shadowRadius: 1,
+                                            elevation: 5,
+                                        },
+                                    { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8 },
+                                ]}
+                                onPress={() => setAccountType('business')}
+                            >
+                                <Text className={`text-md font-medium ${accountType === 'business' ? 'text-white' : ''}`}>Business</Text>
+                            </Pressable>
+                            <Pressable
+                                style={[
+                                    accountType === 'personal'
+                                        ? { backgroundColor: colors.primary.DEFAULT }
+                                        : {
+                                            backgroundColor: 'white',
+                                            shadowColor: '#000',
+                                            shadowOffset: { width: 0, height: 2 },
+                                            shadowOpacity: 0.25,
+                                            shadowRadius: 3.84,
+                                            elevation: 5,
+                                        },
+                                    { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8 },
+                                ]}
+                                onPress={() => setAccountType('personal')}
+                            >
+                                <Text className={`text-md font-medium ${accountType === 'personal' ? 'text-white' : ''}`}>Personal</Text>
+                            </Pressable>
+                        </View>
                     </View>
-                </View>}
+                )}
 
-                {accountType === 'business' && type === 'signup' && (
+                {accountType === 'business' && type === 'signUp' && (
                     <View className="mb-4">
                         <Text className="text-lg mb-1">Business Name</Text>
                         <TextInput
                             value={businessName}
                             onChangeText={setBusinessName}
-                            className="border rounded-md p-2"
+                            onFocus={() => setFocusedField('business-name')}
+                            onBlur={() => setFocusedField(null)}
+                            className={`border focus:outline-primary rounded-md p-2 ${focusedField === 'business-name' ? 'outline-2 outline-primary' : 'border-gray-300'}`}
                             placeholder="Enter your business name"
+                            style={{ borderColor: focusedField === 'business-name' ? colors.primary.DEFAULT : 'gray' }}
                         />
                     </View>
                 )}
 
-                <View className="mb-4">
-                    <Text className="text-lg mb-1">Name</Text>
-                    <TextInput
-                        value={name}
-                        onChangeText={setName}
-                        className="border rounded-md p-2"
-                        placeholder="Enter your name"
-                    />
-                </View>
+                {type === 'signUp' && (
+                    <View className="mb-4">
+                        <Text className="text-lg mb-1">Name</Text>
+                        <TextInput
+                            value={name}
+                            onChangeText={setName}
+                            onFocus={() => setFocusedField('name')}
+                            onBlur={() => setFocusedField(null)}
+                            className={`border focus:outline-primary rounded-md p-2 ${focusedField === 'name' ? 'outline-2 outline-primary' : 'border-gray-300'}`}
+                            placeholder="Enter your name"
+                            style={{ borderColor: focusedField === 'name' ? colors.primary.DEFAULT : 'gray' }}
+                        />
+                    </View>
+                )}
 
                 <View className="mb-4">
                     <Text className="text-lg mb-1">Email</Text>
                     <TextInput
                         value={email}
                         onChangeText={setEmail}
-                        className="border rounded-md p-2"
+                        onFocus={() => setFocusedField('email')}
+                        onBlur={() => setFocusedField(null)}
+                        className={`border focus:outline-primary rounded-md p-2 ${focusedField === 'email' ? 'outline-2 outline-primary' : 'border-gray-300'}`}
                         placeholder="Enter your email"
+                        style={{ borderColor: focusedField === 'email' ? colors.primary.DEFAULT : 'gray' }}
                     />
                 </View>
 
@@ -111,23 +139,30 @@ export function SignUp({ onClose }: Props) {
                     <TextInput
                         value={password}
                         onChangeText={setPassword}
-                        className="border rounded-md p-2"
+                        onFocus={() => setFocusedField('password')}
+                        onBlur={() => setFocusedField(null)}
+                        className={`border focus:outline-primary rounded-md p-2 ${focusedField === 'password' ? 'outline-2 outline-primary' : 'border-gray-300'}`}
                         placeholder="Enter your password"
                         secureTextEntry
+                        style={{ borderColor: focusedField === 'password' ? colors.primary.DEFAULT : 'gray' }}
                     />
                 </View>
 
-                <Pressable className="bg-primary py-3 rounded-md mb-4">
+                <Pressable
+                    className="bg-primary py-3 rounded-md mb-4"
+                    onPress={() => (type === 'signIn' ? login() : signUp())}
+                >
                     <Text className="text-white text-center text-lg font-medium ">
-                        {type === 'signup' ? 'Sign Up' : 'Sign In'}
+                        {type === 'signUp' ? 'Sign Up' : 'Sign In'}
                     </Text>
                 </Pressable>
+
                 <Pressable
-                    className={`border-primary border-2 py-3 rounded-md mb-4`}
-                    onPress={() => setType(type === 'signup' ? 'login' : 'signup')}
+                    className={`border-primary py-3 rounded-md mb-4`}
+                    onPress={() => setType(type === 'signUp' ? 'signIn' : 'signUp')}
                 >
                     <Text className="text-primary text-center text-lg font-medium">
-                        {type === 'signup' ? 'Switch to Sign In' : 'Switch to Sign Up'}
+                        {type === 'signUp' ? 'Already have an account? Sign In' : 'Don\'t have an account? Sign Up'}
                     </Text>
                 </Pressable>
             </View>
