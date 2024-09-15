@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable } from 'react-native';
-import { CenteredModal } from '../utils/Popup';
+import { Popup } from '../utils/Popup';
+import { colors } from '@/constants/Colors';
 
 type Props = { onClose: () => void; };
 
@@ -17,7 +18,7 @@ export function SignUp({ onClose }: Props) {
     };
 
     return (
-        <CenteredModal onClose={onClose}>
+        <Popup onClose={onClose}>
             <View className="p-6 max-w-lg rounded-lg">
                 <View className="flex-row justify-between items-center">
                     <Text className="text-xl font-bold">
@@ -27,21 +28,49 @@ export function SignUp({ onClose }: Props) {
 
                 <Text className="text-gray-800 mb-6">
                     {type === 'signup'
-                        ? 'Sign up to start planning projects with your customers.'
+                        ? 'Sign up to start planning projects with others.'
                         : 'Sign in to continue where you left off.'}
                 </Text>
 
-                <View className="mb-4">
+                {type === 'signup' && <View className="mb-4">
                     <Text className="text-lg mb-1">Account Type</Text>
                     <View className='flex-row gap-2'>
-                        <Pressable className={`px-4 py-2 rounded ${accountType === 'business' ? 'bg-primary' : 'shadow-lg'}`} onPress={toggleAccountType}>
+                        <Pressable
+                            style={[
+                                accountType === 'business'
+                                    ? { backgroundColor: colors.primary.DEFAULT }
+                                    : {
+                                        backgroundColor: 'white',
+                                        shadowColor: '#000',
+                                        shadowOffset: { width: 4, height: 4 },
+                                        shadowOpacity: 0.2,
+                                        shadowRadius: 1,
+                                        elevation: 5, // Android shadow
+                                    },
+                                { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8 },
+                            ]}
+                            onPress={() => setAccountType('business')}>
                             <Text className={`text-md font-medium ${accountType === 'business' ? 'text-white' : ''}`}>Business</Text>
                         </Pressable>
-                        <Pressable className={`px-4 py-2 rounded ${accountType === 'personal' ? 'bg-primary' : 'shadow-lg'}`} onPress={toggleAccountType}>
+                        <Pressable
+                            style={[
+                                accountType === 'personal'
+                                    ? { backgroundColor: colors.primary.DEFAULT }
+                                    : {
+                                        backgroundColor: 'white',
+                                        shadowColor: '#000',
+                                        shadowOffset: { width: 0, height: 2 },
+                                        shadowOpacity: 0.25,
+                                        shadowRadius: 3.84,
+                                        elevation: 5, // Android shadow
+                                    },
+                                { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8 },
+                            ]}
+                            onPress={() => setAccountType('personal')}>
                             <Text className={`text-md font-medium ${accountType === 'personal' ? 'text-white' : ''}`}>Personal</Text>
                         </Pressable>
                     </View>
-                </View>
+                </View>}
 
                 {accountType === 'business' && type === 'signup' && (
                     <View className="mb-4">
@@ -55,17 +84,15 @@ export function SignUp({ onClose }: Props) {
                     </View>
                 )}
 
-                {accountType === 'individual' && type === 'signup' && (
-                    <View className="mb-4">
-                        <Text className="text-lg mb-1">Your Name</Text>
-                        <TextInput
-                            value={name}
-                            onChangeText={setName}
-                            className="border rounded-md p-2"
-                            placeholder="Enter your name"
-                        />
-                    </View>
-                )}
+                <View className="mb-4">
+                    <Text className="text-lg mb-1">Name</Text>
+                    <TextInput
+                        value={name}
+                        onChangeText={setName}
+                        className="border rounded-md p-2"
+                        placeholder="Enter your name"
+                    />
+                </View>
 
                 <View className="mb-4">
                     <Text className="text-lg mb-1">Email</Text>
@@ -102,6 +129,6 @@ export function SignUp({ onClose }: Props) {
                     </Text>
                 </Pressable>
             </View>
-        </CenteredModal>
+        </Popup>
     );
 }

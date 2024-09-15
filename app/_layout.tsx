@@ -1,4 +1,3 @@
-import "../global.css";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { Slot, Stack } from "expo-router";
 import { ConvexReactClient } from "convex/react";

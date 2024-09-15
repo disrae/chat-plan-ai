@@ -1,16 +1,17 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, ScrollView, TouchableOpacity, Image, SafeAreaView } from "react-native";
+import '../constants/styles.css';
+import { View, Text, TextInput, ScrollView, Pressable, Image, SafeAreaView } from "react-native";
 // import { useMediaQuery } from "react-responsive"; // For responsive design with @expo/match-media
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { SignUp } from "@/components/modals/SignUp";
 
-const NavLink = ({ title }) => (
-    <TouchableOpacity>
+const NavLink = ({ title }: { title: string; }) => (
+    <Pressable className="pl-4">
         <Text className="text-sm font-medium hover:underline underline-offset-4">{title}</Text>
-    </TouchableOpacity>
+    </Pressable>
 );
 
-const TestimonialCard = ({ name }) => (
+const TestimonialCard = ({ name }: { name: string; }) => (
     <View className="bg-background rounded-lg p-6 space-y-4">
         <Text className="font-bold">{name}</Text>
         <Text className="text-muted-foreground">
@@ -30,12 +31,14 @@ export default function HomePage() {
             <SafeAreaView className="flex-1 bg-primary-dark mx-4 py-4">
                 <View className="flex-1 flex-col min-h-[100vh]">
                     {/* Header */}
-                    <View className="flex-row items-center h-14 px-4 lg:px-6">
-                        <TouchableOpacity className="flex items-center justify-center">
+                    <View className="flex-row items-center justify-between py-2 px-4 lg:px-6">
+                        <Pressable className="flex items-center justify-center">
                             <AntDesign name="message1" size={24} color="black" />
                             <Text className="sr-only">Chat App</Text>
-                        </TouchableOpacity>
-                        <View className="ml-auto flex-row gap-4 sm:gap-6">
+                        </Pressable>
+
+                        {/* Navigation links aligned to the right with responsive spacing */}
+                        <View className="flex-row ml-auto space-x-2 sm:space-x-4 lg:space-x-10">
                             <NavLink title="Features" />
                             <NavLink title="Pricing" />
                             <NavLink title="About" />
@@ -51,16 +54,16 @@ export default function HomePage() {
                             <Text className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl xl:text-[3.4rem] 2xl:text-[3.75rem] text-center">
                                 Plan projects with customers using AI-powered summaries
                             </Text>
-                            <View className="h-12"></View>
+                            <View className="h-4"></View>
                             <Text className="text-muted-foreground text-center md:text-xl max-w-[700px] mx-auto">
                                 Our chat app helps business owners create detailed project plans with customers using AI-generated summaries
                                 of your conversations.
                             </Text>
                             <View className="h-12"></View>
                             <View className="justify-center items-center">
-                                <TouchableOpacity className="bg-primary px-16 py-4 rounded-md" onPress={() => setModal('sign-up')}>
+                                <Pressable className="bg-primary px-16 py-4 rounded-md" onPress={() => setModal('sign-up')}>
                                     <Text className="text-white text-2xl font-medium">Sign Up</Text>
-                                </TouchableOpacity>
+                                </Pressable>
                             </View>
                         </View>
                         <View className="h-12"></View>
@@ -98,39 +101,15 @@ export default function HomePage() {
                             </View>
                         </View>
 
-                        {/* Sign-Up Section */}
-                        <View className="w-full py-12 md:py-24 lg:py-32 bg-muted">
-                            <Text className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center">
-                                Get started with the Chat App
-                            </Text>
-                            <View className="mx-auto w-full max-w-sm space-y-2">
-                                <View className="flex-row gap-2">
-                                    <TextInput
-                                        className="flex-1 border border-primary rounded-md px-4 py-2"
-                                        placeholder="Enter your email"
-                                    />
-                                    <TouchableOpacity className="bg-primary px-4 py-2 rounded-md">
-                                        <Text className="text-white text-sm font-medium">Sign Up</Text>
-                                    </TouchableOpacity>
-                                </View>
-                                <Text className="text-xs text-muted-foreground text-center">
-                                    Already have an account?{" "}
-                                    <TouchableOpacity>
-                                        <Text className="underline">Sign In</Text>
-                                    </TouchableOpacity>
-                                </Text>
+                        {/* Footer */}
+                        <View className="flex flex-col gap-2 sm:flex-row py-6 pb-20 lg:pb-2 w-full shrink-0 items-center px-4 md:px-6 border-t">
+                            <Text className="text-xs text-muted-foreground">&copy; 2024 Elevate Labs. All rights reserved.</Text>
+                            <View className="sm:ml-auto flex-row gap-4 sm:gap-6">
+                                <NavLink title="Terms of Service" />
+                                <NavLink title="Privacy" />
                             </View>
                         </View>
                     </ScrollView>
-
-                    {/* Footer */}
-                    <View className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
-                        <Text className="text-xs text-muted-foreground">&copy; 2024 Chat App. All rights reserved.</Text>
-                        <View className="sm:ml-auto flex-row gap-4 sm:gap-6">
-                            <NavLink title="Terms of Service" />
-                            <NavLink title="Privacy" />
-                        </View>
-                    </View>
                 </View>
             </SafeAreaView>
         </View>

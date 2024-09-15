@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, FlatList, KeyboardAvoidingView, Platform } from 'react-native';
 import { useQuery, useMutation } from "convex/react";
-import { api } from 'convex/_generated/api';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { api } from '@/convex/_generated/api';
 
 type PathParam = { conversationName: string; };
 

@@ -1,16 +1,16 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, ScrollView, TouchableOpacity, Image, SafeAreaView } from "react-native";
+import { View, Text, TextInput, ScrollView, Pressable, Image, SafeAreaView } from "react-native";
 // import { useMediaQuery } from "react-responsive"; // For responsive design with @expo/match-media
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { SignUp } from "@/components/modals/SignUp";
 
-const NavLink = ({ title }) => (
-    <TouchableOpacity>
+const NavLink = ({ title }: { title: string; }) => (
+    <Pressable onPress={() => console.log('clicked ', title)}>
         <Text className="text-sm font-medium hover:underline underline-offset-4">{title}</Text>
-    </TouchableOpacity>
+    </Pressable>
 );
 
-const TestimonialCard = ({ name }) => (
+const TestimonialCard = ({ name }: { name: string; }) => (
     <View className="bg-background rounded-lg p-6 space-y-4">
         <Text className="font-bold">{name}</Text>
         <Text className="text-muted-foreground">
@@ -21,7 +21,6 @@ const TestimonialCard = ({ name }) => (
 );
 
 export default function HomePage() {
-    // const isLargeScreen = useMediaQuery({ minWidth: 768 });
     const [modal, setModal] = useState<'' | 'sign-up'>('');
 
     return (
@@ -31,10 +30,10 @@ export default function HomePage() {
                 <View className="flex-1 flex-col min-h-[100vh]">
                     {/* Header */}
                     <View className="flex-row items-center h-14 px-4 lg:px-6">
-                        <TouchableOpacity className="flex items-center justify-center">
+                        <Pressable className="flex items-center justify-center">
                             <AntDesign name="message1" size={24} color="black" />
                             <Text className="sr-only">Chat App</Text>
-                        </TouchableOpacity>
+                        </Pressable>
                         <View className="ml-auto flex-row gap-4 sm:gap-6">
                             <NavLink title="Features" />
                             <NavLink title="Pricing" />
@@ -58,9 +57,9 @@ export default function HomePage() {
                             </Text>
                             <View className="h-12"></View>
                             <View className="justify-center items-center">
-                                <TouchableOpacity className="bg-primary px-16 py-4 rounded-md" onPress={() => setModal('sign-up')}>
+                                <Pressable className="bg-primary px-16 py-4 rounded-md" onPress={() => setModal('sign-up')}>
                                     <Text className="text-white text-2xl font-medium">Sign Up</Text>
-                                </TouchableOpacity>
+                                </Pressable>
                             </View>
                         </View>
                         <View className="h-12"></View>
@@ -109,15 +108,15 @@ export default function HomePage() {
                                         className="flex-1 border border-primary rounded-md px-4 py-2"
                                         placeholder="Enter your email"
                                     />
-                                    <TouchableOpacity className="bg-primary px-4 py-2 rounded-md">
+                                    <Pressable className="bg-primary px-4 py-2 rounded-md">
                                         <Text className="text-white text-sm font-medium">Sign Up</Text>
-                                    </TouchableOpacity>
+                                    </Pressable>
                                 </View>
                                 <Text className="text-xs text-muted-foreground text-center">
                                     Already have an account?{" "}
-                                    <TouchableOpacity>
+                                    <Pressable>
                                         <Text className="underline">Sign In</Text>
-                                    </TouchableOpacity>
+                                    </Pressable>
                                 </Text>
                             </View>
                         </View>
