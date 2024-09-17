@@ -9,7 +9,7 @@ import { useAuth, useUser } from "@clerk/clerk-expo";
 export default function HomePage() {
     const { user } = useUser();
     const { signOut, isSignedIn } = useAuth();
-    console.log(JSON.stringify(user, null, 2));
+    console.log({ user });
     const [modal, setModal] = useState<'' | 'sign-up'>('');
 
     return (
