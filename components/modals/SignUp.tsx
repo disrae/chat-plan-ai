@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { Dispatch, useCallback, useState } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, ActivityIndicator } from 'react-native';
 import { Popup } from '../utils/Popup';
 import { colors } from '@/constants/Colors';
@@ -7,10 +7,26 @@ import { useRouter } from 'expo-router';
 import { shadow } from '@/constants/styles';
 import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
+import { HomeScreenModals } from '@/app';
 
-type Props = { onClose: () => void; };
+/**
+ * Test:
+ * Sign up with email
+ */
+const testEmail = `danny.israel+${Date.now()}@gmail.com`;
 
-export function SignUp({ onClose }: Props) {
+type Props = {
+    onClose: () => void;
+    initialState?: {
+        type: 'personal' | 'business';
+        method: 'signup' | 'login';
+    };
+};
+
+export function SignUp({
+    onClose,
+    initialState = { type: 'business', method: 'signup' }
+}: Props) {
     const router = useRouter();
     const { isLoaded: isLoadedSignUp, setActive: setActiveSignUp, signUp } = useSignUp();
     const [pendingVerification, setPendingVerification] = useState(false);
@@ -19,9 +35,10 @@ export function SignUp({ onClose }: Props) {
     const [accountType, setAccountType] = useState<'business' | 'personal'>('business');
     const [businessName, setBusinessName] = useState('');
     const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
+    const [email, setEmail] = useState('' || testEmail);
     const [password, setPassword] = useState('');
     const createUser = useMutation(api.users.createUser);
+    const [localState, setLocalState] = useState(initialState);
 
     const handleSignUp = async () => {
         if (!isLoadedSignUp) return;
@@ -49,7 +66,7 @@ export function SignUp({ onClose }: Props) {
 
             if (completeSignUp.status === 'complete') {
                 await setActiveSignUp({ session: completeSignUp.createdSessionId });
-                router.push('/404');
+                router.push(`/${businessName}`);
             } else {
                 console.error(JSON.stringify(completeSignUp, null, 2));
             }
@@ -84,60 +101,66 @@ export function SignUp({ onClose }: Props) {
         <Popup onClose={onClose}>
             <ScrollView className="p-6 max-w-lg rounded-lg">
                 <View className="flex-row justify-between items-center">
-                    <Text className="text-xl font-bold">{pendingVerification ? 'Verify Email' : 'Sign Up'}</Text>
+                    <Text className="text-xl font-bold">{pendingVerification
+                        ? 'Verify Email'
+                        : localState.method === 'signup' ? 'Sign Up' : 'Sign In'}
+                    </Text>
                 </View>
 
                 {!pendingVerification ? (
                     <>
-                        <View className="mb-4">
-                            <Text className="text-lg mb-1">Account Type</Text>
-                            <View className="flex-row gap-2">
-                                <Pressable
-                                    style={[
-                                        accountType === 'business'
-                                            ? { backgroundColor: colors.primary.DEFAULT }
-                                            : shadow,
-                                        { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8 },
-                                    ]}
-                                    onPress={() => setAccountType('business')}
-                                >
-                                    <Text className={`text-md font-medium ${accountType === 'business' ? 'text-white' : ''}`}>Business</Text>
-                                </Pressable>
-                                <Pressable
-                                    style={[
-                                        accountType === 'personal'
-                                            ? { backgroundColor: colors.primary.DEFAULT }
-                                            : shadow,
-                                        { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8 },
-                                    ]}
-                                    onPress={() => setAccountType('personal')}
-                                >
-                                    <Text className={`text-md font-medium ${accountType === 'personal' ? 'text-white' : ''}`}>Personal</Text>
-                                </Pressable>
-                            </View>
-                        </View>
+                        {localState.method === 'signup' &&
+                            <View>
+                                <View className="mb-4">
+                                    <Text className="text-lg mb-1">Account Type</Text>
+                                    <View className="flex-row gap-2">
+                                        <Pressable
+                                            style={[
+                                                accountType === 'business'
+                                                    ? { backgroundColor: colors.primary.DEFAULT }
+                                                    : shadow,
+                                                { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8 },
+                                            ]}
+                                            onPress={() => setAccountType('business')}
+                                        >
+                                            <Text className={`text-md font-medium ${accountType === 'business' ? 'text-white' : ''}`}>Business</Text>
+                                        </Pressable>
+                                        <Pressable
+                                            style={[
+                                                accountType === 'personal'
+                                                    ? { backgroundColor: colors.primary.DEFAULT }
+                                                    : shadow,
+                                                { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8 },
+                                            ]}
+                                            onPress={() => setAccountType('personal')}
+                                        >
+                                            <Text className={`text-md font-medium ${accountType === 'personal' ? 'text-white' : ''}`}>Personal</Text>
+                                        </Pressable>
+                                    </View>
+                                </View>
 
-                        {accountType === 'business' && (
-                            <View className="mb-4">
-                                <Text className="text-lg mb-1">Business Name</Text>
-                                <TextInput
-                                    value={businessName}
-                                    onChangeText={setBusinessName}
-                                    className="border focus:outline-primary rounded-md p-2"
-                                    placeholder="Enter your business name"
-                                />
-                            </View>
-                        )}
+                                {accountType === 'business' && (
+                                    <View className="mb-4">
+                                        <Text className="text-lg mb-1">Business Name</Text>
+                                        <TextInput
+                                            value={businessName}
+                                            onChangeText={setBusinessName}
+                                            className="border focus:outline-primary rounded-md p-2"
+                                            placeholder="Enter your business name"
+                                        />
+                                    </View>
+                                )}
 
-                        <View className="mb-4">
-                            <Text className="text-lg mb-1">Name</Text>
-                            <TextInput
-                                value={name}
-                                onChangeText={setName}
-                                className="border focus:outline-primary rounded-md p-2"
-                                placeholder="Enter your name"
-                            />
-                        </View>
+                                <View className="mb-4">
+                                    <Text className="text-lg mb-1">Name</Text>
+                                    <TextInput
+                                        value={name}
+                                        onChangeText={setName}
+                                        className="border focus:outline-primary rounded-md p-2"
+                                        placeholder="Enter your name"
+                                    />
+                                </View>
+                            </View>}
 
                         <View className="mb-4">
                             <Text className="text-lg mb-1">Email</Text>
@@ -168,9 +191,24 @@ export function SignUp({ onClose }: Props) {
                             {loading ? (
                                 <ActivityIndicator color="#fff" />
                             ) : (
-                                <Text className="text-white text-center text-lg font-medium ">Sign Up</Text>
+                                <Text className="text-white text-center text-lg font-medium ">{localState.method === 'signup' ? 'Sign Up' : 'Sign In'}</Text>
                             )}
                         </Pressable>
+                        <Pressable
+                            onPress={() => {
+                                setLocalState({
+                                    ...localState,
+                                    method: localState.method === 'signup' ? 'login' : 'signup'
+                                });
+                            }}
+                            className='items-center justify-center py-3 rounded-md  bg-slate-200'
+                        >
+                            <Text className='text-primary font-medium'>{localState.method === 'signup'
+                                ? 'Already have an account? Sign In'
+                                : 'Already have an account? Sign Up'}
+                            </Text>
+                        </Pressable>
+
                     </>
                 ) : (
                     <View>
@@ -190,6 +228,6 @@ export function SignUp({ onClose }: Props) {
                     </View>
                 )}
             </ScrollView>
-        </Popup>
+        </Popup >
     );
 }

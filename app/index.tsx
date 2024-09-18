@@ -1,35 +1,45 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import '../constants/styles.css';
 import { View, Text, TextInput, ScrollView, Pressable, Image, SafeAreaView } from "react-native";
 // import { useMediaQuery } from "react-responsive"; // For responsive design with @expo/match-media
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { SignUp } from "@/components/modals/SignUp";
 import { useAuth, useUser } from "@clerk/clerk-expo";
-
+import { colors } from "@/constants/Colors";
+export type HomeScreenModals = '' | 'sign-up';
 export default function HomePage() {
     const { user } = useUser();
     const { signOut, isSignedIn } = useAuth();
-    console.log({ user });
+
+    console.log(JSON.stringify({ user }, null, 2));
     const [modal, setModal] = useState<'' | 'sign-up'>('');
 
     return (
         <View className="flex-1">
-            {modal === 'sign-up' && <SignUp onClose={() => setModal('')} />}
+            {modal === 'sign-up' &&
+                <SignUp onClose={() => setModal('')} />}
             <SafeAreaView className="flex-1 bg-primary-dark mx-4 py-4">
                 <View className="flex-1 flex-col min-h-[100vh]">
                     {/* Header */}
                     <View className="flex-row items-center justify-between py-2 px-4 lg:px-6">
                         <Pressable className="flex items-center justify-center">
-                            <AntDesign name="message1" size={24} color="black" />
+                            <AntDesign name="message1" size={24} color={colors.primary.DEFAULT} />
                             <Text className="sr-only">Chat App</Text>
                         </Pressable>
 
                         {/* Navigation links aligned to the right with responsive spacing */}
                         <View className="flex-row ml-auto space-x-2 sm:space-x-4 lg:space-x-10">
-                            <NavLink title="Features" />
-                            <NavLink title="Pricing" />
-                            <NavLink title="About" />
-                            <NavLink title="Contact" />
+                            {user?.id
+                                ? <Pressable
+                                    onPress={() => { signOut(); }}
+                                    className="bg-slate-200 shadow px-4 py-2 rounded">
+                                    <Text className="font-medium">Logout</Text>
+                                </Pressable>
+                                : <Pressable
+                                    onPress={() => { setModal('sign-up'); }}
+                                    className="bg-slate-200 shadow px-4 py-2 rounded">
+                                    <Text className="font-medium">Login</Text>
+                                </Pressable>}
                         </View>
                     </View>
 
