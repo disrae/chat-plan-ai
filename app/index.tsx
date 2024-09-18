@@ -7,7 +7,7 @@ import { SignUp } from "@/components/modals/SignUp";
 import { useAuth, useUser } from "@clerk/clerk-expo";
 import { colors } from "@/constants/Colors";
 
-type HomeScreenModals = '' | 'signup' | 'login';
+export type HomeScreenModals = '' | 'signup' | 'login';
 export default function HomePage() {
     const { user } = useUser();
     const { signOut, isSignedIn } = useAuth();
@@ -53,7 +53,7 @@ export default function HomePage() {
                             </Text>
                             <View className="h-4"></View>
                             <Text className="text-muted-foreground text-center md:text-xl max-w-[700px] mx-auto">
-                                Our chat app helps business owners create detailed project plans with customers using AI-generated summaries
+                                Create detailed project plans with customers using AI-generated summaries
                                 of your conversations.
                             </Text>
                             <View className="h-12"></View>

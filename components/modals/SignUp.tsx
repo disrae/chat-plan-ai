@@ -8,6 +8,7 @@ import { shadow } from '@/constants/styles';
 import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { HomeScreenModals } from '@/app';
+import { ClerkAPIError } from '@clerk/types';
 
 /**
  * Test:
@@ -33,11 +34,18 @@ export function SignUp({
     const [businessName, setBusinessName] = useState('');
     const [name, setName] = useState('');
     const [email, setEmail] = useState('' || testEmail);
+    const [errors, setErrors] = useState<ClerkAPIError[]>();
     const [password, setPassword] = useState('');
     const createUser = useMutation(api.users.createUser);
     const [localState, setLocalState] = useState(initialState);
 
+    const updateError = (error: string) => {
+        setErrors(error);
+        setInterval(() => setErrors(''), 10000);
+    };
+
     const handleSignUp = async () => {
+        return accountType === 'business' ? router.push(`/${businessName}`) : router.push('/conversations');
         if (!isLoadedSignUp) return;
         setLoading(true);
         try {
@@ -63,17 +71,14 @@ export function SignUp({
 
             if (completeSignUp.status === 'complete') {
                 await setActiveSignUp({ session: completeSignUp.createdSessionId });
-                router.push(`/${businessName}`);
+                accountType === 'business' ? router.push(`/${businessName}`) : router.push('/conversations');
             } else {
                 console.error(JSON.stringify(completeSignUp, null, 2));
             }
         } catch (err: any) {
             // See https://clerk.com/docs/custom-flows/error-handling
             // for more info on error handling
-            if (isClerkAPIResponseError(err)) {
-                console.log(err.errors);
-            }
-            console.error(JSON.stringify(err, null, 2));
+            if (isClerkAPIResponseError(err)) setErrors(err.errors);
             console.error(JSON.stringify(err, null, 2));
         }
     };
@@ -169,7 +174,7 @@ export function SignUp({
                             />
                         </View>
 
-                        <View className="mb-6">
+                        <View className="">
                             <Text className="text-lg mb-1">Password</Text>
                             <TextInput
                                 value={password}
@@ -179,6 +184,16 @@ export function SignUp({
                                 secureTextEntry
                             />
                         </View>
+
+                        {errors ? errors.map((err, index) => (
+                            <View key={index}
+                                className='h-12 justify-center items-center'>
+                                <Text className="text-red-500 text-center">
+                                    {err.longMessage}
+                                </Text>
+                            </View>
+                        )
+                        ) : <View className='h-12' />}
 
                         <Pressable
                             className="bg-primary py-3 rounded-md mb-4"
@@ -197,7 +212,7 @@ export function SignUp({
                         >
                             <Text className='text-primary font-medium'>{localState === 'signup'
                                 ? 'Already have an account? Sign In'
-                                : 'Already have an account? Sign Up'}
+                                : 'Don\'t have an account? Sign Up'}
                             </Text>
                         </Pressable>
 
