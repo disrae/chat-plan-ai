@@ -6,18 +6,18 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import { SignUp } from "@/components/modals/SignUp";
 import { useAuth, useUser } from "@clerk/clerk-expo";
 import { colors } from "@/constants/Colors";
-export type HomeScreenModals = '' | 'sign-up';
+
+type HomeScreenModals = '' | 'signup' | 'login';
 export default function HomePage() {
     const { user } = useUser();
     const { signOut, isSignedIn } = useAuth();
 
-    console.log(JSON.stringify({ user }, null, 2));
-    const [modal, setModal] = useState<'' | 'sign-up'>('');
+    const [modal, setModal] = useState<HomeScreenModals>('');
 
     return (
         <View className="flex-1">
-            {modal === 'sign-up' &&
-                <SignUp onClose={() => setModal('')} />}
+            {modal &&
+                <SignUp setModal={setModal} initialState={modal} />}
             <SafeAreaView className="flex-1 bg-primary-dark mx-4 py-4">
                 <View className="flex-1 flex-col min-h-[100vh]">
                     {/* Header */}
@@ -36,9 +36,9 @@ export default function HomePage() {
                                     <Text className="font-medium">Logout</Text>
                                 </Pressable>
                                 : <Pressable
-                                    onPress={() => { setModal('sign-up'); }}
+                                    onPress={() => { setModal('login'); }}
                                     className="bg-slate-200 shadow px-4 py-2 rounded">
-                                    <Text className="font-medium">Login</Text>
+                                    <Text className="font-medium">Sign In</Text>
                                 </Pressable>}
                         </View>
                     </View>
@@ -58,7 +58,7 @@ export default function HomePage() {
                             </Text>
                             <View className="h-12"></View>
                             <View className="justify-center items-center">
-                                <Pressable className="bg-primary px-16 py-4 rounded-md" onPress={() => setModal('sign-up')}>
+                                <Pressable className="bg-primary px-16 py-4 rounded-md" onPress={() => setModal('signup')}>
                                     <Text className="text-white text-2xl font-medium">Sign Up</Text>
                                 </Pressable>
                             </View>

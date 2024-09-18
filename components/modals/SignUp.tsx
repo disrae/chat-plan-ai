@@ -16,16 +16,13 @@ import { HomeScreenModals } from '@/app';
 const testEmail = `danny.israel+${Date.now()}@gmail.com`;
 
 type Props = {
-    onClose: () => void;
-    initialState?: {
-        type: 'personal' | 'business';
-        method: 'signup' | 'login';
-    };
+    setModal: Dispatch<React.SetStateAction<HomeScreenModals>>;
+    initialState?: 'signup' | 'login';
 };
 
 export function SignUp({
-    onClose,
-    initialState = { type: 'business', method: 'signup' }
+    setModal,
+    initialState = 'signup'
 }: Props) {
     const router = useRouter();
     const { isLoaded: isLoadedSignUp, setActive: setActiveSignUp, signUp } = useSignUp();
@@ -98,18 +95,18 @@ export function SignUp({
     // }, [isLoadedSignIn, email, password]);
 
     return (
-        <Popup onClose={onClose}>
+        <Popup onClose={() => setModal('')}>
             <ScrollView className="p-6 max-w-lg rounded-lg">
                 <View className="flex-row justify-between items-center">
                     <Text className="text-xl font-bold">{pendingVerification
                         ? 'Verify Email'
-                        : localState.method === 'signup' ? 'Sign Up' : 'Sign In'}
+                        : localState === 'signup' ? 'Sign Up' : 'Sign In'}
                     </Text>
                 </View>
 
                 {!pendingVerification ? (
                     <>
-                        {localState.method === 'signup' &&
+                        {localState === 'signup' &&
                             <View>
                                 <View className="mb-4">
                                     <Text className="text-lg mb-1">Account Type</Text>
@@ -191,19 +188,14 @@ export function SignUp({
                             {loading ? (
                                 <ActivityIndicator color="#fff" />
                             ) : (
-                                <Text className="text-white text-center text-lg font-medium ">{localState.method === 'signup' ? 'Sign Up' : 'Sign In'}</Text>
+                                <Text className="text-white text-center text-lg font-medium ">{localState === 'signup' ? 'Sign Up' : 'Sign In'}</Text>
                             )}
                         </Pressable>
                         <Pressable
-                            onPress={() => {
-                                setLocalState({
-                                    ...localState,
-                                    method: localState.method === 'signup' ? 'login' : 'signup'
-                                });
-                            }}
+                            onPress={() => setLocalState(localState === 'signup' ? 'login' : 'signup')}
                             className='items-center justify-center py-3 rounded-md  bg-slate-200'
                         >
-                            <Text className='text-primary font-medium'>{localState.method === 'signup'
+                            <Text className='text-primary font-medium'>{localState === 'signup'
                                 ? 'Already have an account? Sign In'
                                 : 'Already have an account? Sign Up'}
                             </Text>
