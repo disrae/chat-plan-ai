@@ -45,7 +45,7 @@ export function SignUp({
     };
 
     const handleSignUp = async () => {
-        return accountType === 'business' ? router.push(`/${businessName}`) : router.push('/conversations');
+        // return accountType === 'business' ? router.push(`/${businessName}`) : router.push('/conversations');
         if (!isLoadedSignUp) return;
         setLoading(true);
         try {

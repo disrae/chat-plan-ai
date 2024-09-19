@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@auth/core": "^0.34.2",
-    "@clerk/clerk-expo": "^2.2.10",
+    "@clerk/clerk-expo": "^2.2.14",
     "@convex-dev/auth": "^0.0.66",
     "@expo/vector-icons": "^14.0.2",
     "@react-navigation/native": "^6.0.2",

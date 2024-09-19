@@ -74,7 +74,7 @@ const tokenCache = Platform.OS === "web" ? {
 
 export default function Layout() {
   return <ConvexAuthProvider client={convex} storage={secureStorage}>
-    <ClerkProvider publishableKey={publishableKey}>
+    <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
       <ClerkLoaded>
         <Slot />
       </ClerkLoaded>
