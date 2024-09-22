@@ -4,20 +4,17 @@ import { View, Text, TextInput, ScrollView, Pressable, Image, SafeAreaView } fro
 // import { useMediaQuery } from "react-responsive"; // For responsive design with @expo/match-media
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { SignUp } from "@/components/modals/SignUp";
-import { useAuth, useUser } from "@clerk/clerk-expo";
 import { colors } from "@/constants/Colors";
 
-export type HomeScreenModals = '' | 'signup' | 'login';
+export type HomeScreenModals = '' | 'signUp' | 'signIn';
 export default function HomePage() {
-    const { user } = useUser();
-    const { signOut, isSignedIn } = useAuth();
 
     const [modal, setModal] = useState<HomeScreenModals>('');
 
     return (
         <View className="flex-1">
             {modal &&
-                <SignUp setModal={setModal} initialState={modal} />}
+                <SignUp setModal={setModal} initialFlow={modal} />}
             <SafeAreaView className="flex-1 bg-primary-dark mx-4 py-4">
                 <View className="flex-1 flex-col min-h-[100vh]">
                     {/* Header */}
@@ -29,7 +26,7 @@ export default function HomePage() {
 
                         {/* Navigation links aligned to the right with responsive spacing */}
                         <View className="flex-row ml-auto space-x-2 sm:space-x-4 lg:space-x-10">
-                            {user?.id
+                            {/* {user?.id
                                 ? <Pressable
                                     onPress={() => { signOut(); }}
                                     className="bg-slate-200 shadow px-4 py-2 rounded">
@@ -39,7 +36,7 @@ export default function HomePage() {
                                     onPress={() => { setModal('login'); }}
                                     className="bg-slate-200 shadow px-4 py-2 rounded">
                                     <Text className="font-medium">Sign In</Text>
-                                </Pressable>}
+                                </Pressable>} */}
                         </View>
                     </View>
 
@@ -58,7 +55,7 @@ export default function HomePage() {
                             </Text>
                             <View className="h-12"></View>
                             <View className="justify-center items-center">
-                                <Pressable className="bg-primary px-16 py-4 rounded-md" onPress={() => setModal('signup')}>
+                                <Pressable className="bg-primary px-16 py-4 rounded-md" onPress={() => setModal('signUp')}>
                                     <Text className="text-white text-2xl font-medium">Sign Up</Text>
                                 </Pressable>
                             </View>

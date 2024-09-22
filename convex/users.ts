@@ -1,5 +1,16 @@
 import { v } from 'convex/values';
 import { mutation } from './_generated/server';
+import { query } from "./_generated/server";
+import { auth } from "./auth";
+import { getAuthUserId, } from '@convex-dev/auth/server';
+
+export const currentUser = query({
+    args: {},
+    handler: async (ctx) => {
+        const userId = await getAuthUserId(ctx);
+        return userId !== null ? ctx.db.get(userId) : null;
+    },
+});
 
 // Mutation to create a new user and their business (if applicable)
 export const createUser = mutation({
