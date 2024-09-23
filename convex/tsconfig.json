@@ -20,6 +20,6 @@
     "isolatedModules": true,
     "noEmit": true
   },
-  "include": ["./**/*"],
+  "include": ["./**/*", "CustomPassword.ts"],
   "exclude": ["./_generated"]
 }

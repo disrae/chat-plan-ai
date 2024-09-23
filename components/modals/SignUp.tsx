@@ -4,7 +4,7 @@ import { Popup } from '../utils/Popup';
 import { colors } from '@/constants/Colors';
 import { useRouter } from 'expo-router';
 import { shadow } from '@/constants/styles';
-import { useMutation } from 'convex/react';
+import { useMutation, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { HomeScreenModals } from '@/app';
 import { useAuthActions } from '@convex-dev/auth/react';
@@ -28,7 +28,8 @@ export function SignUp({
     const [name, setName] = useState('');
     const [email, setEmail] = useState('' || testEmail);
     const [password, setPassword] = useState('');
-    const createUser = useMutation(api.users.createUser);
+    // const createUser = useMutation(api.users.createUser);
+    const user = useQuery(api.users.currentUser);
     const [flow, setFlow] = useState(initialFlow);
 
     // const updateError = (error: string) => {
@@ -37,14 +38,9 @@ export function SignUp({
     // };
 
     const handleSignUp = async () => {
-        // return accountType === 'business' ? router.push(`/${businessName}`) : router.push('/conversations');
         setLoading(true);
         try {
-            signIn("password", { email, password, flow });
-            // if (!user.id) throw new Error('Clerk failed to create user.');
-            // await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
-            // createUser({ businessName, clerkId: user.id, email, name, accountType });
-            // setPendingVerification(true);
+            await signIn("password", { email, password, flow, name, accountType, conversationIds: [], businessName });
         } catch (err) {
             console.error(err);
         } finally {

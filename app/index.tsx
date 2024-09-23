@@ -5,11 +5,15 @@ import { View, Text, TextInput, ScrollView, Pressable, Image, SafeAreaView } fro
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { SignUp } from "@/components/modals/SignUp";
 import { colors } from "@/constants/Colors";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 export type HomeScreenModals = '' | 'signUp' | 'signIn';
 export default function HomePage() {
-
+    const userId = useQuery(api.users.currentUser);
     const [modal, setModal] = useState<HomeScreenModals>('');
+
+    console.log({ userId });
 
     return (
         <View className="flex-1">
