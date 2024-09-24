@@ -7,10 +7,12 @@ import { SignUp } from "@/components/modals/SignUp";
 import { colors } from "@/constants/Colors";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { useAuthActions } from "@convex-dev/auth/dist/react";
 
 export type HomeScreenModals = '' | 'signUp' | 'signIn';
 export default function HomePage() {
     const userId = useQuery(api.users.currentUser);
+    const { signOut } = useAuthActions();
     const [modal, setModal] = useState<HomeScreenModals>('');
 
     console.log({ userId });
@@ -30,17 +32,17 @@ export default function HomePage() {
 
                         {/* Navigation links aligned to the right with responsive spacing */}
                         <View className="flex-row ml-auto space-x-2 sm:space-x-4 lg:space-x-10">
-                            {/* {user?.id
+                            {userId
                                 ? <Pressable
                                     onPress={() => { signOut(); }}
                                     className="bg-slate-200 shadow px-4 py-2 rounded">
                                     <Text className="font-medium">Logout</Text>
                                 </Pressable>
                                 : <Pressable
-                                    onPress={() => { setModal('login'); }}
+                                    onPress={() => { setModal('signIn'); }}
                                     className="bg-slate-200 shadow px-4 py-2 rounded">
                                     <Text className="font-medium">Sign In</Text>
-                                </Pressable>} */}
+                                </Pressable>}
                         </View>
                     </View>
 

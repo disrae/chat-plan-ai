@@ -29,14 +29,18 @@ export default defineSchema({
     }),
 
     users: defineTable({
-        name: v.string(),
-        email: v.string(),
+        name: v.optional(v.string()),
+        image: v.optional(v.string()),
+        email: v.optional(v.string()),
+        emailVerificationTime: v.optional(v.number()),
+        phone: v.optional(v.string()),
+        phoneVerificationTime: v.optional(v.number()),
+        isAnonymous: v.optional(v.boolean()),
         accountType: v.union(v.literal("personal"), v.literal("business")),
         businesses: v.union(v.array(v.id("businesses")), v.null()),
         conversationIds: v.array(v.id("conversations")),
         businessName: v.union(v.string(), v.null()),
-    }),
-    // .index("by_clerkId", ["clerkId"]),
+    }).index("email", ["email"]),
 
     businesses: defineTable({
         ownerId: v.id("users"),  // The user who owns this business

@@ -8,6 +8,7 @@ import { useMutation, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { HomeScreenModals } from '@/app';
 import { useAuthActions } from '@convex-dev/auth/react';
+import { ConvexError } from 'convex/values';
 
 const testEmail = `danny.israel+${Date.now()}@gmail.com`;
 
@@ -27,6 +28,7 @@ export function SignUp({
     const [businessName, setBusinessName] = useState('');
     const [name, setName] = useState('');
     const [email, setEmail] = useState('' || testEmail);
+    const [error, setError] = useState('');
     const [password, setPassword] = useState('');
     // const createUser = useMutation(api.users.createUser);
     const user = useQuery(api.users.currentUser);
@@ -41,8 +43,19 @@ export function SignUp({
         setLoading(true);
         try {
             await signIn("password", { email, password, flow, name, accountType, conversationIds: [], businessName });
-        } catch (err) {
-            console.error(err);
+        } catch (error) {
+            const errorMessage =
+                // Check whether the error is an application error
+                error instanceof ConvexError
+                    ? // Access data and cast it to the type we expect
+                    (error.data as { message: string; }).message
+                    : // Must be some developer error,
+                    // and prod deployments will not
+                    // reveal any more information about it
+                    // to the client
+                    "Unexpected error occurred";
+            console.log({ errorMessage });
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -169,9 +182,9 @@ export function SignUp({
                         />
                     </View>
 
-                    {false
+                    {error
                         ? <View className='h-12 justify-center items-center'>
-                            <Text className="text-red-500 text-center">{"error message"}</Text>
+                            <Text className="text-red-500 text-center">{JSON.stringify(error)}</Text>
                         </View>
                         : <View className='h-12' />}
 
