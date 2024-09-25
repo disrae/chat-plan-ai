@@ -15,7 +15,7 @@ export default function HomePage() {
     const { signOut } = useAuthActions();
     const [modal, setModal] = useState<HomeScreenModals>('');
 
-    console.log({ userId });
+    console.log(JSON.stringify({ userId }, null, 2));
 
     return (
         <View className="flex-1">

@@ -2,7 +2,7 @@ import { Password } from "@convex-dev/auth/providers/Password";
 import { DataModel } from "./_generated/dataModel";
 import { z } from "zod";
 import { ConvexError } from "convex/values";
-import { ResendOTP } from "./ResendOTP.ts";
+import { ResendOTP } from "./ResendOTP";
 
 const ParamsSchema = z.object({
     email: z.string().email(),
