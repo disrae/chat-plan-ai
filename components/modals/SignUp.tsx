@@ -10,7 +10,7 @@ import { HomeScreenModals } from '@/app';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { ConvexError } from 'convex/values';
 
-const testEmail = `danny.israel+${Date.now()}@gmail.com`;
+const testEmail = `danny.israel@gmail.com`;
 
 type Props = {
     setModal: Dispatch<React.SetStateAction<HomeScreenModals>>;
@@ -23,7 +23,7 @@ export function SignUp({
 }: Props) {
     const router = useRouter();
     const { signIn } = useAuthActions();
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState<'signUp' | 'signIn' | 'verifying' | ''>('');
     const [accountType, setAccountType] = useState<'business' | 'personal'>('business');
     const [businessName, setBusinessName] = useState('');
     const [name, setName] = useState('');
@@ -41,7 +41,7 @@ export function SignUp({
     };
 
     const handleSignUp = async () => {
-        setLoading(true);
+        setLoading('signUp');
         try {
             await signIn("password", { email, password, flow, name, accountType, conversationIds: [], businessName });
             setEmailSent(true);
@@ -53,12 +53,13 @@ export function SignUp({
             console.log({ errorMessage });
             updateError(errorMessage);
         } finally {
-            setLoading(false);
+            setLoading('');
         }
     };
 
     const handleVerifyEmail = async () => {
         try {
+            setLoading('verifying');
             await signIn("password", { email, code: verificationCode, password, flow: "email-verification" });
             router.push(accountType === 'business' ? `/${businessName}` : '/conversations');
         } catch (error) {
@@ -70,23 +71,18 @@ export function SignUp({
             updateError(errorMessage);
             setEmailSent(false);
         }
+        setLoading('');
     };
 
-    // const handleSignIn = useCallback(async () => {
-    //     if (!isLoadedSignIn) { return; }
-    //     try {
-    //         const signInAttempt = await signIn.create({ identifier: email, password });
-
-    //         if (signInAttempt.status === 'complete') {
-    //             await setActiveSignIn({ session: signInAttempt.createdSessionId });
-    //             router.replace('/');
-    //         } else {
-    //             console.error(JSON.stringify(signInAttempt, null, 2));
-    //         }
-    //     } catch (err: any) {
-    //         console.error(JSON.stringify(err, null, 2));
-    //     }
-    // }, [isLoadedSignIn, email, password]);
+    const handleSignIn = async () => {
+        setLoading('signIn');
+        try {
+            await signIn("password", { email, password, flow });
+        } catch (err: any) {
+            console.error(JSON.stringify(err, null, 2));
+        }
+        setLoading('');
+    };
 
     return (
         <Popup onClose={() => setModal('')}>
@@ -197,8 +193,8 @@ export function SignUp({
 
                         <Pressable
                             className="bg-primary py-3 rounded-md mb-4"
-                            onPress={handleSignUp}
-                            disabled={loading}
+                            onPress={() => flow === 'signUp' ? handleSignUp() : handleSignIn()}
+                            disabled={!!loading}
                         >
                             {loading ? (
                                 <ActivityIndicator color="#fff" />

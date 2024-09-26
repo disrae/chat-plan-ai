@@ -8,14 +8,24 @@ import { colors } from "@/constants/Colors";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAuthActions } from "@convex-dev/auth/dist/react";
+import { router } from "expo-router";
 
 export type HomeScreenModals = '' | 'signUp' | 'signIn';
 export default function HomePage() {
-    const userId = useQuery(api.users.currentUser);
+    const user = useQuery(api.users.currentUser);
     const { signOut } = useAuthActions();
     const [modal, setModal] = useState<HomeScreenModals>('');
 
-    console.log(JSON.stringify({ userId }, null, 2));
+    console.log(JSON.stringify(user, null, 2));
+
+    useEffect(() => {
+        if (user) {
+            user.accountType === 'business'
+                ? router.push(`/${user.businessName}`)
+                : router.push('/conversations');
+            setModal('');
+        }
+    }, [user]);
 
     return (
         <View className="flex-1">
@@ -32,7 +42,7 @@ export default function HomePage() {
 
                         {/* Navigation links aligned to the right with responsive spacing */}
                         <View className="flex-row ml-auto space-x-2 sm:space-x-4 lg:space-x-10">
-                            {userId
+                            {user
                                 ? <Pressable
                                     onPress={() => { signOut(); }}
                                     className="bg-slate-200 shadow px-4 py-2 rounded">

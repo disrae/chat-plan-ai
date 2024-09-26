@@ -1,7 +1,6 @@
 import { mutation } from "./_generated/server";
 import { v } from "convex/values";
 
-// Mutation to add a message
 export const addMessage = mutation({
     args: {
         author: v.string(),
@@ -10,7 +9,6 @@ export const addMessage = mutation({
         conversationId: v.id("conversations"),
     },
     handler: async (ctx, { author, role, body, conversationId }) => {
-        // Insert the message into the messages table
         await ctx.db.insert("messages", {
             author,
             role,

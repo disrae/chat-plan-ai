@@ -8,34 +8,34 @@ import { shadow } from '@/constants/styles';
 
 // Sample data
 const projects = [
-    {
-        id: 1,
-        name: "June 24 Wedding Tofino",
-        customer: "John and Nathalie",
-        conversations: [
-            { id: 2, title: "Day 1 Planning" },
-            { id: 3, title: "Day 2 Planning" },
-            { id: 4, title: "Day 3 Planning" },
-            { id: 1, title: "Overall Planning" },
-        ]
-    },
-    {
-        id: 2,
-        name: "October 29 Wedding Mackenzie Beach",
-        customer: "Suzanne",
-        conversations: [
-            { id: 3, title: "Event 1" },
-            { id: 4, title: "Event 2" },
-        ]
-    },
-    {
-        id: 3,
-        name: "Lemonade Hotel Weekends",
-        customer: "John Wicks",
-        conversations: [
-            { id: 5, title: "Requirements Gathering" },
-        ]
-    },
+    // {
+    //     id: 1,
+    //     name: "June 24 Wedding Tofino",
+    //     customer: "John and Nathalie",
+    //     conversations: [
+    //         { id: 2, title: "Day 1 Planning" },
+    //         { id: 3, title: "Day 2 Planning" },
+    //         { id: 4, title: "Day 3 Planning" },
+    //         { id: 1, title: "Overall Planning" },
+    //     ]
+    // },
+    // {
+    //     id: 2,
+    //     name: "October 29 Wedding Mackenzie Beach",
+    //     customer: "Suzanne",
+    //     conversations: [
+    //         { id: 3, title: "Event 1" },
+    //         { id: 4, title: "Event 2" },
+    //     ]
+    // },
+    // {
+    //     id: 3,
+    //     name: "Lemonade Hotel Weekends",
+    //     customer: "John Wicks",
+    //     conversations: [
+    //         { id: 5, title: "Requirements Gathering" },
+    //     ]
+    // },
 ];
 
 export default function CompanyDashboar() {
@@ -59,16 +59,16 @@ export default function CompanyDashboar() {
     };
 
     return (
-        <SafeAreaView className="flex-1 mx-4 my-6 p-4 items-center">
+        <SafeAreaView className="flex-1 mx-4 items-center gap-y-4">
             <View className='w-full max-w-2xl'>
                 {/* Company Info */}
-                <View className="mb-6">
-                    <Text className="text-3xl font-bold mb-2">{company}</Text>
+                <View className="mb-4">
+                    <Text className="text-3xl font-bold my-2">{company}</Text>
                     <View className="gap-2 justify-between sm:flex-row sm:items-center">
                         <Text className="text-xl font-semibold">Projects & Conversations</Text>
                         <TouchableOpacity
                             onPress={addNewProject}
-                            className="flex-row bg-primary py-2 px-2 rounded-lg items-center"
+                            className="flex-row bg-primary border py-2 px-2 rounded-lg items-center"
                         >
                             <Text className='text-white pr-1 -mt-[2px] text-xl font-medium '>+</Text>
                             <Text className="text-white font-medium ">New Project</Text>

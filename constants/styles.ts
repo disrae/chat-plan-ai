@@ -6,3 +6,5 @@ export const shadow = {
     shadowRadius: 1,
     elevation: 5,
 };
+
+export const margin = 'mx-4';
