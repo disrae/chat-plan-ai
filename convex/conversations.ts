@@ -28,7 +28,7 @@ export const getIdFromName = query({
 });
 
 export const createConversation = mutation({
-    args: { name: v.string(), owner: v.string(), participants: v.array(v.string()) },
+    args: { name: v.string(), owner: v.id('users'), participants: v.array(v.string()) },
     handler: async (ctx, { name, owner }) => {
         const newConversation = await ctx.db.insert('conversations', { name, owner, participants: [owner] });
         return newConversation;

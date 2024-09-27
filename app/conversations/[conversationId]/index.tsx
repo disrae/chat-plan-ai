@@ -9,8 +9,8 @@ type PathParam = { conversationName: string; };
 export default function Chat() {
     const router = useRouter();
     const { conversationName } = useLocalSearchParams() as PathParam;
-    const conversationId = useQuery(api.conversations.getIdFromName, { name: conversationName });
-    console.log({ conversationId });
+    // const conversationId = useQuery(api.conversations.getIdFromName, { name: conversationName });
+    // console.log({ conversationId });
 
     // Query to get the messages for the current conversation
     const messages = useQuery(api.conversations.loadConversation, { conversationName });
@@ -23,19 +23,19 @@ export default function Chat() {
     const [author, setAuthor] = useState('');
 
     // Function to handle sending a new message
-    const handleSendMessage = async () => {
-        if (newMessage.trim() && author.trim()) {
-            await addMessage({
-                author: author,
-                role: 'owner',
-                body: newMessage,
-                conversationId
-            });
+    // const handleSendMessage = async () => {
+    //     if (newMessage.trim() && author.trim()) {
+    //         await addMessage({
+    //             author: author,
+    //             role: 'owner',
+    //             body: newMessage,
+    //             conversationId
+    //         });
 
-            // Clear the input fields after sending the message
-            setNewMessage('');
-        }
-    };
+    //         // Clear the input fields after sending the message
+    //         setNewMessage('');
+    //     }
+    // };
 
     // Render each message in the list
     const renderMessage = ({ item }: { item: any; }) => (
@@ -75,7 +75,7 @@ export default function Chat() {
                     onChangeText={setNewMessage}
                     style={{ borderWidth: 1, padding: 8, marginBottom: 10 }}
                 />
-                <Button title="Send Message" onPress={handleSendMessage} />
+                {/* <Button title="Send Message" onPress={handleSendMessage} /> */}
             </View>
         </KeyboardAvoidingView>
     );

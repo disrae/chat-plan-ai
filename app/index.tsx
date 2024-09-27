@@ -1,30 +1,28 @@
 import React, { useEffect, useState } from "react";
 import '../constants/styles.css';
-import { View, Text, TextInput, ScrollView, Pressable, Image, SafeAreaView } from "react-native";
-// import { useMediaQuery } from "react-responsive"; // For responsive design with @expo/match-media
+import { View, Text, ScrollView, Pressable, Image, SafeAreaView } from "react-native";
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { SignUp } from "@/components/modals/SignUp";
+import { SignUp } from "@/components/popups/SignUp";
 import { colors } from "@/constants/Colors";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAuthActions } from "@convex-dev/auth/dist/react";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 
 export type HomeScreenModals = '' | 'signUp' | 'signIn';
 export default function HomePage() {
+    const router = useRouter();
     const user = useQuery(api.users.currentUser);
     const { signOut } = useAuthActions();
     const [modal, setModal] = useState<HomeScreenModals>('');
 
-    console.log(JSON.stringify(user, null, 2));
+    console.log(JSON.stringify({ user }, null, 2));
 
     useEffect(() => {
-        if (user) {
-            user.accountType === 'business'
-                ? router.push(`/${user.businessName}`)
-                : router.push('/conversations');
-            setModal('');
-        }
+        if (!user) { return; }
+        user.accountType == 'business'
+            ? router.push(`/${user.businessName}`)
+            : router.push('/conversations');
     }, [user]);
 
     return (
