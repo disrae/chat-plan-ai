@@ -197,7 +197,7 @@ export function SignUp({
                             disabled={!!loading}
                         >
                             {loading ? (
-                                <ActivityIndicator color="#fff" />
+                                <ActivityIndicator style={{ height: 28 }} color="#fff" />
                             ) : (
                                 <Text className="text-white text-center text-lg font-medium">{flow === 'signUp' ? 'Sign Up' : 'Sign In'}</Text>
                             )}

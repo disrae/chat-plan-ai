@@ -1,4 +1,4 @@
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
 export const addMessage = mutation({
@@ -35,5 +35,17 @@ export const updateMessage = mutation({
     handler: async (ctx, { messageId, newBody }) => {
         // Update the message body
         await ctx.db.patch(messageId, { body: newBody });
+    },
+});
+
+export const getConversationMessages = query({
+    args: { conversationId: v.id("conversations") },
+    handler: async (ctx, { conversationId }) => {
+        const messages = await ctx.db
+            .query("messages")
+            .withIndex("by_conversationId", (q) => q.eq("conversationId", conversationId))
+            .collect();
+        console.log({ messages });
+        return messages;
     },
 });

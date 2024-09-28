@@ -43,16 +43,18 @@ export default defineSchema({
     }).index("email", ["email"]),
 
     businesses: defineTable({
-        ownerId: v.id("users"),  // The user who owns this business
+        ownerId: v.id("users"),
         name: v.string(),
-        projects: v.array(v.id("projects")),  // List of projects this business owns
+        projects: v.array(v.id("projects")),
     })
         .index("by_ownerId", ["ownerId"]),
 
     projects: defineTable({
-        businessId: v.id("businesses"),  // The business this project belongs to
+        owner: v.id("users"),
+        businessId: v.id("businesses"),
         name: v.string(),
-        conversations: v.array(v.id("conversations")),  // List of conversations in this project
+        conversations: v.array(v.id("conversations")),
     })
-        .index("by_businessId", ["businessId"]),
+        .index("by_businessId", ["businessId"])
+        .index("by_owner", ["owner"]),
 });

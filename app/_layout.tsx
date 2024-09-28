@@ -18,6 +18,6 @@ const secureStorage = Platform.OS === "web" ? {
 
 export default function Layout() {
   return <ConvexAuthProvider client={convex} storage={secureStorage}>
-    <Slot />
+    <Slot screenOptions={{ headerShown: false }} />
   </ConvexAuthProvider>;
 }

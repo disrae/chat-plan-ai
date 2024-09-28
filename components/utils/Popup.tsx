@@ -12,6 +12,7 @@ export function Popup({ onClose, children }: Props) {
         <Pressable
             className="absolute w-full h-full justify-center items-center z-10"
             onPress={onClose}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
             <BlurView
                 intensity={50}
