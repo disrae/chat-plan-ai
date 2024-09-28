@@ -10,8 +10,6 @@ import { HomeScreenModals } from '@/app';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { ConvexError } from 'convex/values';
 
-const testEmail = `danny.israel@gmail.com`;
-
 type Props = {
     setModal: Dispatch<React.SetStateAction<HomeScreenModals>>;
     initialFlow?: 'signUp' | 'signIn';
@@ -27,7 +25,7 @@ export function SignUp({
     const [accountType, setAccountType] = useState<'business' | 'personal'>('business');
     const [businessName, setBusinessName] = useState('');
     const [name, setName] = useState('');
-    const [email, setEmail] = useState('' || testEmail);
+    const [email, setEmail] = useState('');
     const [error, setError] = useState('');
     const [password, setPassword] = useState('');
     const [emailSent, setEmailSent] = useState(false);
