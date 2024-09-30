@@ -7,7 +7,6 @@ export const { auth, signIn, signOut, store } = convexAuth({
   providers: [Password],
   callbacks: {
     createOrUpdateUser: async (ctx, args) => {
-      console.log(JSON.stringify({ argsInCreateCallback: args }, null, 2));
       if (args.existingUserId) {
         // Optionally merge updated fields into the existing user object here
         return args.existingUserId;

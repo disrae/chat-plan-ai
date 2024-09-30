@@ -9,6 +9,7 @@ import { api } from '@/convex/_generated/api';
 import { HomeScreenModals } from '@/app';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { ConvexError } from 'convex/values';
+import { useZodErrorHandler } from '@/hooks/useZodErrorHandler';
 
 type Props = {
     setModal: Dispatch<React.SetStateAction<HomeScreenModals>>;
@@ -25,31 +26,22 @@ export function SignUp({
     const [accountType, setAccountType] = useState<'business' | 'personal'>('business');
     const [businessName, setBusinessName] = useState('');
     const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [error, setError] = useState('');
+    const [email, setEmail] = useState('' || 'danny.israel@gmail.com');
     const [password, setPassword] = useState('');
     const [emailSent, setEmailSent] = useState(false);
     const [verificationCode, setVerificationCode] = useState('');
     const user = useQuery(api.users.currentUser);
     const [flow, setFlow] = useState(initialFlow);
 
-    const updateError = (error: string) => {
-        setError(error);
-        setTimeout(() => setError(''), 10000);
-    };
+    const { handleError, errors } = useZodErrorHandler();
 
     const handleSignUp = async () => {
         setLoading('signUp');
         try {
-            await signIn("password", { email, password, flow, name, accountType, conversationIds: [], businessName });
+            const result = await signIn("password", { email, password, flow, name, accountType, conversationIds: [], businessName });
             setEmailSent(true);
         } catch (error) {
-            const errorMessage =
-                error instanceof ConvexError
-                    ? (error.data as { message: string; }).message
-                    : "Unexpected error occurred";
-            console.log({ errorMessage });
-            updateError(errorMessage);
+            handleError(error);
         } finally {
             setLoading('');
         }
@@ -58,15 +50,10 @@ export function SignUp({
     const handleVerifyEmail = async () => {
         try {
             setLoading('verifying');
-            await signIn("password", { email, code: verificationCode, password, flow: "email-verification" });
+            await signIn("password", { email: email.toLowerCase(), code: verificationCode, password, flow: "email-verification" });
             router.push(accountType === 'business' ? `/${businessName}` : '/conversations');
         } catch (error) {
-            console.error(error);
-            const errorMessage =
-                error instanceof ConvexError
-                    ? (error.data as { message: string; }).message
-                    : "Unexpected error occurred";
-            updateError(errorMessage);
+            handleError(error);
             setEmailSent(false);
         }
         setLoading('');
@@ -76,8 +63,8 @@ export function SignUp({
         setLoading('signIn');
         try {
             await signIn("password", { email, password, flow });
-        } catch (err: any) {
-            console.error(JSON.stringify(err, null, 2));
+        } catch (error) {
+            handleError(error);
         }
         setLoading('');
     };
@@ -167,6 +154,9 @@ export function SignUp({
                             <TextInput
                                 value={email}
                                 onChangeText={setEmail}
+                                keyboardType="email-address"
+                                autoCapitalize="none"
+                                autoCorrect={false}
                                 className="border focus:outline-primary rounded-md p-2"
                                 placeholder="Enter your email"
                             />
@@ -183,14 +173,14 @@ export function SignUp({
                             />
                         </View>
 
-                        {error
-                            ? <View className='h-12 justify-center items-center'>
-                                <Text className="text-red-500 text-center">{JSON.stringify(error)}</Text>
+                        {!!errors.length
+                            ? <View className='py-4 gap-y-4 justify-center '>
+                                {errors.map(e => <Text className="text-red-500">{e}</Text>)}
                             </View>
                             : <View className='h-12' />}
 
                         <Pressable
-                            className="bg-primary py-3 rounded-md mb-4"
+                            className="bg-primary h-12 items-center justify-center rounded-md mb-4"
                             onPress={() => flow === 'signUp' ? handleSignUp() : handleSignIn()}
                             disabled={!!loading}
                         >
@@ -202,7 +192,7 @@ export function SignUp({
                         </Pressable>
                         <Pressable
                             onPress={() => setFlow(flow === 'signUp' ? 'signIn' : 'signUp')}
-                            className='items-center justify-center py-3 rounded-md  bg-slate-200'
+                            className='items-center justify-center h-12 rounded-md  bg-slate-200'
                         >
                             <Text className='text-primary font-medium'>{flow === 'signUp'
                                 ? 'Already have an account? Sign In'
@@ -214,4 +204,4 @@ export function SignUp({
             </ScrollView>
         </Popup >
     );
-}
+};

@@ -13,7 +13,6 @@ export default Password<DataModel>({
     profile(params) {
         const { error, data } = ParamsSchema.safeParse(params);
         if (error) { throw new ConvexError(error.format()); }
-        console.log(JSON.stringify({ paramsInProfile: params, data }, null, 2));
         return {
             email: data.email as string,
             name: params.name as string,

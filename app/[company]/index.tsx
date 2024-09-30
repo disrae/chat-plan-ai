@@ -22,16 +22,26 @@ export default function CompanyDashboard() {
     const { company } = useLocalSearchParams();
     const { signOut } = useAuthActions();
     const dashboard = useQuery(api.users.getUserDashboardData);
+    const user = useQuery(api.users.currentUser);
     const business = dashboard?.businesses?.[0];
     const [expandedProjects, setExpandedProjects] = useState<Array<Id<'projects'>>>([]);
     const [modal, setModal] = useState<DashboardModals>({ type: '' });
 
-    // console.log(JSON.stringify({ dashboard }, null, 2));
     useEffect(() => {
+        console.log(JSON.stringify({ dashboard }, null, 2));
         if (dashboard?.user.accountType === 'personal') {
             router.replace('/conversations');
         }
+        if (!user) {
+            router.replace('/');
+        }
     }, [dashboard?.user]);
+
+    useEffect(() => {
+        if (!user) {
+            router.replace('/');
+        }
+    }, [user]);
 
     const toggleProject = (projectId: Id<'projects'>) => {
         setExpandedProjects(prev =>
