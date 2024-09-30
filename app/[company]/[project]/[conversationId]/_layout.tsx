@@ -9,10 +9,9 @@ export default function TabLayout() {
             <Tabs.Screen
                 name="index"
                 options={{
-                    title: 'index',
+                    title: 'Chat',
                     tabBarIcon: ({ color }) => <FontAwesome size={28} name="comments" color={color} />,
                     headerShown: false,
-                    headerBackground: () => <View className="bg-red-500" />,
                 }}
             />
             <Tabs.Screen

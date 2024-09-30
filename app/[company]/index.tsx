@@ -17,7 +17,7 @@ export type DashboardModals = {
     payload?: { projectId?: Id<'projects'>; };
 };
 
-export default function CompanyDashboar() {
+export default function CompanyDashboard() {
     const router = useRouter();
     const { company } = useLocalSearchParams();
     const { signOut } = useAuthActions();
@@ -73,7 +73,7 @@ export default function CompanyDashboar() {
                     </Pressable>
 
                     {/* Search Input */}
-                    {business?.projects.length && <TextInput
+                    {!!business?.projects.length && <TextInput
                         className="bg-white p-2 mb-4 border rounded-lg"
                         placeholder="Search projects..."
                         keyboardType="default"

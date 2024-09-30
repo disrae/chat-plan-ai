@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, FlatList, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, Button, FlatList, KeyboardAvoidingView, Platform, SafeAreaView, Pressable } from 'react-native';
 import { useQuery, useMutation } from "convex/react";
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
+import { colors } from '@/constants/Colors';
 
 // type PathParam = { conversationName: string; };
 
@@ -50,36 +52,48 @@ export default function Chat() {
     );
     if (!conversation) { return null; }
     return <KeyboardAvoidingView
-        style={{ flex: 1, justifyContent: 'space-between' }}
+        className='flex-1 justify-between'
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-        <View style={{ padding: 20 }}>
-            {/* <Text style={{ fontSize: 24, fontWeight: 'bold' }}>Chat Dashboard: {conversation.name}</Text> */}
+        <SafeAreaView className='flex-1'>
+            <View className=' bg-primary'>
+                <Text className='text-slate-100 text-2xl font-bold px-4 py-2'>
+                    {conversation.name}
+                </Text>
+            </View>
 
             {/* List of Messages */}
-            <FlatList
-                data={messages ?? []}
-                renderItem={renderMessage}
-                keyExtractor={(item) => item._id}
-            />
-        </View>
+            <View className='flex-1 bg-white'>
+                <FlatList
+                    className=''
+                    data={messages ?? []}
+                    renderItem={renderMessage}
+                    keyExtractor={(item) => item._id}
+                />
+            </View>
 
-        {/* Input for new message */}
-        <View style={{ padding: 10 }}>
-            <TextInput
-                placeholder="Your name"
-                value={author}
-                onChangeText={setAuthor}
-                style={{ borderBottomWidth: 1, padding: 8, marginBottom: 10 }}
-            />
-            <TextInput
-                placeholder="Type a message"
-                value={newMessage}
-                onChangeText={setNewMessage}
-                style={{ borderWidth: 1, padding: 8, marginBottom: 10 }}
-            />
-            {/* <Button title="Send Message" onPress={handleSendMessage} /> */}
-        </View>
+            {/* Input for new message */}
+            <View className=' bg-slate-50 px-2 py-2'>
+                {/* <TextInput
+                    placeholder="Your name"
+                    value={author}
+                    onChangeText={setAuthor}
+                    style={{ borderBottomWidth: 1, padding: 8, marginBottom: 10 }}
+                /> */}
+                <View className='flex-row items-center'>
+                    <TextInput
+                        className='flex-1 text-slate-100 border border-gray-400 rounded p-2 tracking-tighter h-8'
+                        placeholder="Type a message"
+                        value={newMessage}
+                        onChangeText={setNewMessage}
+                    />
+                    <Pressable className='rounded p-1 ml-2 h-8' onPress={() => null} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                        <FontAwesome name="send" size={24} color={colors.primary.DEFAULT} />
+                    </Pressable>
+                </View>
+                {/* <Button title="Send Message" onPress={handleSendMessage} /> */}
+            </View>
+        </SafeAreaView>
     </KeyboardAvoidingView>;
 
 }
