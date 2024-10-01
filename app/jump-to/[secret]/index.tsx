@@ -3,6 +3,7 @@ import { Popup } from '@/components/utils/Popup';
 import { colors } from '@/constants/Colors';
 import { shadow } from '@/constants/styles';
 import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
 import { useZodErrorHandler } from '@/hooks/useZodErrorHandler';
 import { useAuthActions } from '@convex-dev/auth/dist/react';
 import { AntDesign } from '@expo/vector-icons';
@@ -26,16 +27,21 @@ export default function index() {
     const user = useQuery(api.users.currentUser);
     const [flow, setFlow] = useState('signUp' as 'signUp' | 'signIn');
     const addUserToConversation = useMutation(api.conversations.addParticipant);
+    const conversationId = useQuery(api.conversations.getConversationBySecret, { secret }) as Id<'conversations'>;
+    const conversation = useQuery(api.conversations.getConversationById, { conversationId });
 
-    useEffect(() => {
-        const handleSignedUp = async () => {
-            if (user) {
-                const conversationId = await addUserToConversation({ secret });
-                router.replace(`/conversations/${conversationId}`);
-            }
-        };
-        handleSignedUp();
-    }, [user]);
+    console.log(JSON.stringify({ conversation }, null, 2));
+
+    // useEffect(() => {
+    //     const handleSignedUp = async () => {
+    //         if (!conversation) return null;
+    //         if (user) {
+    //             const conversationId = await addUserToConversation({ secret });
+    //             router.replace(`/conversations/${conversation?._id}`);
+    //         }
+    //     };
+    //     handleSignedUp();
+    // }, [user]);
 
 
     const { handleError, errors } = useZodErrorHandler();
@@ -73,7 +79,7 @@ export default function index() {
         }
         setLoading('');
     };
-    if (user) return null; <SafeAreaView>
+    if (!user) return null; <SafeAreaView>
         <Pressable className='p-4' onPress={router.back}>
             <Text>Back</Text>
         </Pressable>
@@ -81,6 +87,11 @@ export default function index() {
     return (
         <SafeAreaView className="flex-1 mx-4 py-4">
             <ScrollView className="p-6 max-w-lg rounded-lg">
+                {conversation && <View className='py-2 gap-1'>
+                    <Text className='text-slate-800 text-lg font-medium'>You have been invited to join a conversation</Text>
+                    <Text>{`${conversation.businessName} has invited you to join the ${conversation.name} conversation as part of the ${conversation.projectName} project.`}</Text>
+                    <Text>If you alreadu have an account, sign up, otherwise sign in.</Text>
+                </View>}
                 <View className="flex-row justify-between items-center">
                     <Text className="text-xl font-bold">{flow === 'signUp' ? 'Sign Up' : 'Sign In'}
                     </Text>
@@ -210,6 +221,7 @@ export default function index() {
                         </Pressable>
 
                     </>}
+                <View className='h-12' />
             </ScrollView>
         </SafeAreaView>
     );
