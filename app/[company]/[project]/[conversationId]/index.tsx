@@ -23,6 +23,7 @@ export default function Chat() {
     const [newMessage, setNewMessage] = useState('');
     const user = useQuery(api.users.currentUser);
     const conversation = useQuery(api.conversations.getConversationById, { conversationId });
+    const isOwner = useQuery(api.conversations.isOwner, { conversationId });
     const messages = useQuery(api.messages.list, { conversationId });
     const send = useMutation(api.messages.send);
     const [loading, setLoading] = useState<'sending' | ''>('');
@@ -73,31 +74,36 @@ export default function Chat() {
                     </Pressable>
                     <View className='flex-1 py-2 pl-2'>
                         <Text className='text-slate-100 text-lg font-medium text-right'>
+                            {conversation.businessName}
+                        </Text>
+                        <Text className='text-slate-100 font-medium text-right'>
+                            {conversation.projectName}
+                        </Text>
+                        <Text className='text-slate-100 text-right pt-1'>
                             {conversation.name}
                         </Text>
                     </View>
                 </View>
                 {/* Share Chat Button */}
-                <View className='flex-row justify-end pb-2'>
-                    <Pressable
-                        className='flex-row items-center px-3 bg-slate-200 py-2 mr-4 rounded'
+                <View className='flex-row justify-end pb-3'>
+                    {isOwner && <Pressable
+                        className='flex-row items-center pr-2 pl-1 bg-slate-200 py-2 mr-4 rounded'
                         onPress={copyToClipboard} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
                         <EvilIcons name="link" size={20} color="black" />
-                        <Text className=' text font-medium text-right pl-2'>
+                        <Text className=' text font-medium text-right'>
                             Share Chat
                         </Text>
-                    </Pressable>
+                    </Pressable>}
                 </View>
-                <View className='flex-row justify-end pb-2'>
-                    <Pressable
-                        // href={`/jump-to/${conversation?.secret}`}
-                        onPress={() => router.push(`/jump-to/${conversation?.secret}`)}
+                {/* <View className='flex-row justify-end pb-2'>
+                    <Link
+                        href={`/jump-to/${conversation?.secret}`}
                         className='flex-row items-center px-3 bg-slate-200 py-2 mr-4 rounded'>
                         <Text className=' text font-medium text-right pl-2'>
                             {`/jump-to/${conversation?.secret}`}
                         </Text>
-                    </Pressable>
-                </View>
+                    </Link>
+                </View> */}
             </View>
 
             {/* Messages */}

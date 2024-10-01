@@ -23,13 +23,12 @@ export default function Chat() {
     const [newMessage, setNewMessage] = useState('');
     const user = useQuery(api.users.currentUser);
     const conversation = useQuery(api.conversations.getConversationById, { conversationId });
+    const isOwner = useQuery(api.conversations.isOwner, { conversationId });
     const messages = useQuery(api.messages.list, { conversationId });
     const send = useMutation(api.messages.send);
     const [loading, setLoading] = useState<'sending' | ''>('');
     const [modal, setModal] = useState<{ type: 'share-info' | ''; payload?: { shareLink: string; }; }>({ type: '' });
-
-    console.log(JSON.stringify({ messages }, null, 2));
-
+    console.log(JSON.stringify({ conversation }, null, 2));
     const sendMessage = async () => {
         try {
             setLoading('sending');
@@ -73,12 +72,18 @@ export default function Chat() {
                     </Pressable>
                     <View className='flex-1 py-2 pl-2'>
                         <Text className='text-slate-100 text-lg font-medium text-right'>
+                            {conversation.businessName}
+                        </Text>
+                        <Text className='text-slate-100 font-medium text-right'>
+                            {conversation.projectName}
+                        </Text>
+                        <Text className='text-slate-100 text-right pt-1'>
                             {conversation.name}
                         </Text>
                     </View>
                 </View>
                 {/* Share Chat Button */}
-                <View className='flex-row justify-end pb-2'>
+                {isOwner && <View className='flex-row justify-end pb-2'>
                     <Pressable
                         className='flex-row items-center px-3 bg-slate-200 py-2 mr-4 rounded'
                         onPress={copyToClipboard} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
@@ -87,17 +92,7 @@ export default function Chat() {
                             Share Chat
                         </Text>
                     </Pressable>
-                </View>
-                <View className='flex-row justify-end pb-2'>
-                    <Pressable
-                        // href={`/jump-to/${conversation?.secret}`}
-                        onPress={() => router.push(`/jump-to/${conversation?.secret}`)}
-                        className='flex-row items-center px-3 bg-slate-200 py-2 mr-4 rounded'>
-                        <Text className=' text font-medium text-right pl-2'>
-                            {`/jump-to/${conversation?.secret}`}
-                        </Text>
-                    </Pressable>
-                </View>
+                </View>}
             </View>
 
             {/* Messages */}

@@ -26,7 +26,7 @@ export function SignUp({
     const [accountType, setAccountType] = useState<'business' | 'personal'>('business');
     const [businessName, setBusinessName] = useState('');
     const [name, setName] = useState('');
-    const [email, setEmail] = useState('' || 'danny.israel@gmail.com');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [emailSent, setEmailSent] = useState(false);
     const [verificationCode, setVerificationCode] = useState('');

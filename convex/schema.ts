@@ -34,6 +34,8 @@ export default defineSchema({
     conversations: defineTable({
         name: v.string(),
         owner: v.id("users"),
+        business: v.id("businesses"),
+        project: v.id("projects"),
         participants: v.array(v.id("users")),
         secret: v.string(),
     })

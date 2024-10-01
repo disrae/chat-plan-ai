@@ -1,4 +1,4 @@
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 
@@ -23,9 +23,36 @@ export const exists = query({
 export const getConversationById = query({
     args: { conversationId: v.id("conversations") },
     handler: async (ctx, { conversationId }) => {
+        const userId = await getAuthUserId(ctx);
+        if (!userId) { throw new ConvexError("Unauthorized, no user identity found"); }
+
+        const conversation = await ctx.db.get(conversationId);
+        if (!conversation) { throw new ConvexError("Conversation not found"); }
+        if (!conversation.participants.includes(userId)) {
+            throw new ConvexError("User is not a participant in the conversation.");
+        }
+
+        const business = await ctx.db.get(conversation.business);
+        if (!business) { throw new ConvexError("Business not found"); }
+
+        const project = await ctx.db.get(conversation.project);
+        if (!project) { throw new ConvexError("Project not found"); }
+        return {
+            ...conversation,
+            businessName: business?.name,
+            projectName: project?.name,
+        };
+    },
+});
+
+export const isOwner = query({
+    args: { conversationId: v.id("conversations") },
+    handler: async (ctx, { conversationId }) => {
         const conversation = await ctx.db.get(conversationId);
         if (!conversation) { throw new Error("Conversation not found"); }
-        return conversation;
+        const userId = await getAuthUserId(ctx);
+        if (!userId) { throw new Error("Unauthorized, no user identity found"); }
+        return conversation.owner === userId;
     },
 });
 
@@ -44,9 +71,9 @@ export const getIdFromName = query({
 
 export const addConversation = mutation({
     args: {
-        name: v.string(), projectId: v.id("projects")
+        name: v.string(), projectId: v.id("projects"), business: v.id("businesses")
     },
-    handler: async (ctx, { name, projectId }) => {
+    handler: async (ctx, { name, projectId, business }) => {
 
         const userId = await getAuthUserId(ctx);
         if (!userId) { throw new Error("Unauthorized, no user identity found"); }
@@ -57,6 +84,8 @@ export const addConversation = mutation({
         const newConversation = await ctx.db.insert('conversations', {
             name,
             owner: userId,
+            project: projectId,
+            business,
             participants: [userId],
             secret: generateSecret(12)
         });
@@ -82,9 +111,8 @@ export const getConversationBySecret = query({
     args: { secret: v.string() },
     handler: async (ctx, { secret }) => {
         const conversation = await ctx.db.query('conversations').withIndex('by_secret', q => (q.eq("secret", secret))).unique();
-        console.log(JSON.stringify({ conversation }, null, 2));
         if (!conversation) { throw new Error("Conversation not found"); }
-        return conversation;
+        return conversation._id;
     },
 });
 

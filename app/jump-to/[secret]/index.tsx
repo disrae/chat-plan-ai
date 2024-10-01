@@ -13,7 +13,6 @@ import { ActivityIndicator, Pressable, SafeAreaView, ScrollView, Text, TextInput
 
 export default function index() {
     const { secret } = useLocalSearchParams() as { secret: string; };
-    const conversation = useQuery(api.conversations.getConversationBySecret, { secret });
     const router = useRouter();
     const { signIn } = useAuthActions();
     const [loading, setLoading] = useState<'signUp' | 'signIn' | 'verifying' | ''>('');
@@ -26,7 +25,6 @@ export default function index() {
     const [verificationCode, setVerificationCode] = useState('');
     const user = useQuery(api.users.currentUser);
     const [flow, setFlow] = useState('signUp' as 'signUp' | 'signIn');
-    const conversationId = useQuery(api.conversations.getConversationBySecret, { secret });
     const addUserToConversation = useMutation(api.conversations.addParticipant);
 
     useEffect(() => {
@@ -39,7 +37,6 @@ export default function index() {
         handleSignedUp();
     }, [user]);
 
-    console.log(JSON.stringify({ conversation, user, conversationId }, null, 2));
 
     const { handleError, errors } = useZodErrorHandler();
 
@@ -76,7 +73,11 @@ export default function index() {
         }
         setLoading('');
     };
-
+    if (user) return null; <SafeAreaView>
+        <Pressable className='p-4' onPress={router.back}>
+            <Text>Back</Text>
+        </Pressable>
+    </SafeAreaView>;
     return (
         <SafeAreaView className="flex-1 mx-4 py-4">
             <ScrollView className="p-6 max-w-lg rounded-lg">

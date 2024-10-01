@@ -77,7 +77,7 @@ export function AddConversation({ setModal, projectId }: Props) {
                             try {
                                 if (!name) { throw new Error('The conversation name is required'); }
                                 if (!projectId) { throw new Error('Contact the developer, no projectId found'); }
-                                await addConversation({ name, projectId });
+                                await addConversation({ name, projectId, business: dashboard.businesses[0]._id });
                                 setModal({ type: '' });
                             } catch (error) {
                                 console.error(error);
