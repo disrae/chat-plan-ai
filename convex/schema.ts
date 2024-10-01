@@ -35,9 +35,11 @@ export default defineSchema({
         name: v.string(),
         owner: v.id("users"),
         participants: v.array(v.id("users")),
+        secret: v.string(),
     })
         .index("by_participant", ["participants"])
-        .index("by_name", ["name"]),
+        .index("by_name", ["name"])
+        .index("by_secret", ["secret"]),
     messages: defineTable({
         conversationId: v.id("conversations"),
         author: v.string(),

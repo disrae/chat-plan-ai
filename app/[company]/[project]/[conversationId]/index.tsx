@@ -1,12 +1,21 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, FlatList, KeyboardAvoidingView, Platform, SafeAreaView, Pressable, ActivityIndicator } from 'react-native';
 import { useQuery, useMutation } from "convex/react";
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter, useLocalSearchParams, Link } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 import { colors } from '@/constants/Colors';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import * as Clipboard from 'expo-clipboard';
+import EvilIcons from '@expo/vector-icons/EvilIcons';
+import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
+import { ShareInfo } from '@/components/popups/ShareInfo';
+
+export type ConversationModals = {
+    type: '' | 'share-info';
+    payload?: { shareLink: string; };
+};
 
 export default function Chat() {
     const router = useRouter();
@@ -17,6 +26,7 @@ export default function Chat() {
     const messages = useQuery(api.messages.list, { conversationId });
     const send = useMutation(api.messages.send);
     const [loading, setLoading] = useState<'sending' | ''>('');
+    const [modal, setModal] = useState<{ type: 'share-info' | ''; payload?: { shareLink: string; }; }>({ type: '' });
 
     console.log(JSON.stringify({ messages }, null, 2));
 
@@ -38,21 +48,54 @@ export default function Chat() {
         }
     };
 
+    const copyToClipboard = async () => {
+        try {
+            const url = `https://chatplanai.com/jump-to/${conversation?.secret}`;
+            await Clipboard.setStringAsync(url);
+            setModal({ type: 'share-info', payload: { shareLink: url } });
+        } catch (error) {
+            console.error("Failed to copy URL: ", error);
+        }
+    };
+
     if (!conversation) { return null; }
     return <KeyboardAvoidingView
         className='flex-1 justify-between'
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
+        {modal.type === 'share-info' && <ShareInfo setModal={setModal} shareLink={modal.payload?.shareLink} />}
         <SafeAreaView className='flex-1'>
             {/* Header */}
-            <View className=' flex-row bg-primary-dark justify-between items-center px-4 '>
-                <Pressable onPress={router.back} className='' hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                    <AntDesign name="arrowleft" size={24} color="white" />
-                </Pressable>
-                <View className='flex-1 py-2 pl-2'>
-                    <Text className='text-slate-100 text-lg font-medium text-right'>
-                        {conversation.name}
-                    </Text>
+            <View className='bg-primary-dark'>
+                <View className=' flex-row justify-between items-center px-4 '>
+                    <Pressable onPress={router.back} className='' hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                        <AntDesign name="arrowleft" size={24} color="white" />
+                    </Pressable>
+                    <View className='flex-1 py-2 pl-2'>
+                        <Text className='text-slate-100 text-lg font-medium text-right'>
+                            {conversation.name}
+                        </Text>
+                    </View>
+                </View>
+                {/* Share Chat Button */}
+                <View className='flex-row justify-end pb-2'>
+                    <Pressable
+                        className='flex-row items-center px-3 bg-slate-200 py-2 mr-4 rounded'
+                        onPress={copyToClipboard} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                        <EvilIcons name="link" size={20} color="black" />
+                        <Text className=' text font-medium text-right pl-2'>
+                            Share Chat
+                        </Text>
+                    </Pressable>
+                </View>
+                <View className='flex-row justify-end pb-2'>
+                    <Link
+                        href={`/jump-to/${conversation?.secret}`}
+                        className='flex-row items-center px-3 bg-slate-200 py-2 mr-4 rounded'>
+                        <Text className=' text font-medium text-right pl-2'>
+                            {`/jump-to/${conversation?.secret}`}
+                        </Text>
+                    </Link>
                 </View>
             </View>
 

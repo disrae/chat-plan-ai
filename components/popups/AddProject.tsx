@@ -8,7 +8,7 @@ import { DashboardModals } from '@/app/[company]';
 type Props = { setModal: React.Dispatch<React.SetStateAction<DashboardModals>>; };
 
 export function AddProject({ setModal }: Props) {
-    const [loading, setLoading] = useState<'creating-conversation' | ''>('');
+    const [loading, setLoading] = useState<'creating-project' | ''>('');
     const [name, setName] = useState('');
     const [error, setError] = useState('');
     const addProject = useMutation(api.projects.addProject);
@@ -20,7 +20,7 @@ export function AddProject({ setModal }: Props) {
     };
 
     return (
-        <Popup onClose={() => setModal('')}>
+        <Popup onClose={() => setModal({ type: '' })}>
             <ScrollView className="p-6 max-w-lg rounded-lg bg-white shadow-lg">
                 <View className="">
 
@@ -59,7 +59,7 @@ export function AddProject({ setModal }: Props) {
                             setLoading('creating-project');
                             try {
                                 const project = await addProject({ name, businessId: dashboard.businesses[0]._id });
-                                setModal('');
+                                setModal({ type: '' });
                             } catch (error) {
                                 console.error(error);
                                 updateError('Something went wrong.');

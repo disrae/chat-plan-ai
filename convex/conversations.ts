@@ -2,6 +2,15 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 
+function generateSecret(length: number) {
+    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let result = "";
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return result;
+};
+
 export const exists = query({
     args: { name: v.string() },
     handler: async (ctx, { name }) => {
@@ -48,7 +57,8 @@ export const addConversation = mutation({
         const newConversation = await ctx.db.insert('conversations', {
             name,
             owner: userId,
-            participants: [userId]
+            participants: [userId],
+            secret: generateSecret(12)
         });
         await ctx.db.patch(userId, { conversationIds: [...user.conversationIds, newConversation] });
         const project = await ctx.db.get(projectId);
@@ -66,4 +76,14 @@ export const getMessages = query({
                 q => (q.eq("conversationId", conversationId))).collect();
         return messages;
     }
+});
+
+export const getConversationBySecret = query({
+    args: { secret: v.string() },
+    handler: async (ctx, { secret }) => {
+        const conversation = await ctx.db.query('conversations').withIndex('by_secret', q => (q.eq("secret", secret))).unique();
+        console.log(JSON.stringify({ conversation }, null, 2));
+        if (!conversation) { throw new Error("Conversation not found"); }
+        return conversation;
+    },
 });
