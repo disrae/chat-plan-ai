@@ -4,30 +4,6 @@ import { v } from "convex/values";
 
 export default defineSchema({
     ...authTables,
-    messages: defineTable({
-        author: v.string(),
-        role: v.union(v.literal("user"), v.literal("owner")),
-        body: v.string(),
-        conversationId: v.id("conversations"),
-    }).index("by_conversationId", ["conversationId"]),
-
-    conversations: defineTable({
-        name: v.string(),
-        owner: v.id("users"),
-        participants: v.array(v.id("users")),
-    })
-        .index("by_participant", ["participants"])
-        .index("by_name", ["name"]),
-
-    summaries: defineTable({
-        conversationId: v.id("conversations"),
-        sections: v.array(v.object({
-            title: v.string(),
-            bullets: v.array(v.string()),
-        })),
-        dateGenerated: v.number(),
-    }),
-
     users: defineTable({
         email: v.string(),
         name: v.string(),
@@ -41,14 +17,12 @@ export default defineSchema({
         businessName: v.union(v.string(), v.null()),
         conversationIds: v.array(v.id("conversations")),
     }).index("email", ["email"]),
-
     businesses: defineTable({
         ownerId: v.id("users"),
         name: v.string(),
         projects: v.array(v.id("projects")),
     })
         .index("by_ownerId", ["ownerId"]),
-
     projects: defineTable({
         owner: v.id("users"),
         businessId: v.id("businesses"),
@@ -57,4 +31,25 @@ export default defineSchema({
     })
         .index("by_businessId", ["businessId"])
         .index("by_owner", ["owner"]),
+    conversations: defineTable({
+        name: v.string(),
+        owner: v.id("users"),
+        participants: v.array(v.id("users")),
+    })
+        .index("by_participant", ["participants"])
+        .index("by_name", ["name"]),
+    messages: defineTable({
+        conversationId: v.id("conversations"),
+        author: v.string(),
+        name: v.string(),
+        body: v.string(),
+    }).index("by_conversationId", ["conversationId"]),
+    summaries: defineTable({
+        conversationId: v.id("conversations"),
+        sections: v.array(v.object({
+            title: v.string(),
+            bullets: v.array(v.string()),
+        })),
+        dateGenerated: v.number(),
+    }),
 });

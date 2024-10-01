@@ -3,39 +3,35 @@ import { View, Text, TextInput, Button, FlatList, KeyboardAvoidingView, Platform
 import { useQuery, useMutation } from "convex/react";
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
 
-type PathParam = { conversationName: string; };
+/**
+ */
+
+type PathParam = { conversationId: Id<'conversations'>; };
 
 export default function Chat() {
     const router = useRouter();
-    const { conversationName } = useLocalSearchParams() as PathParam;
-    // const conversationId = useQuery(api.conversations.getIdFromName, { name: conversationName });
-    // console.log({ conversationId });
+    const { conversationId } = useLocalSearchParams() as PathParam;
+    const messages = useQuery(api.messages.list, { conversationId });
+    const sendMessage = useMutation(api.messages.send);
 
-    // Query to get the messages for the current conversation
-    const messages = useQuery(api.conversations.loadConversation, { conversationName });
-
-    // Mutation to add a message
-    const addMessage = useMutation(api.messages.addMessage);
-
-    // State to hold the new message body and author
     const [newMessage, setNewMessage] = useState('');
     const [author, setAuthor] = useState('');
 
-    // Function to handle sending a new message
-    // const handleSendMessage = async () => {
-    //     if (newMessage.trim() && author.trim()) {
-    //         await addMessage({
-    //             author: author,
-    //             role: 'owner',
-    //             body: newMessage,
-    //             conversationId
-    //         });
-
-    //         // Clear the input fields after sending the message
-    //         setNewMessage('');
-    //     }
-    // };
+    const handleSendMessage = async () => {
+        if (newMessage.trim() && author.trim()) {
+            try {
+                await sendMessage({
+                    body: newMessage,
+                    conversationId
+                });
+                setNewMessage('');
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    };
 
     // Render each message in the list
     const renderMessage = ({ item }: { item: any; }) => (
@@ -62,18 +58,19 @@ export default function Chat() {
             </View>
 
             {/* Input for new message */}
-            <View style={{ padding: 10 }}>
-                <TextInput
+            <View className=''>
+                {/* <TextInput
                     placeholder="Your name"
                     value={author}
                     onChangeText={setAuthor}
                     style={{ borderBottomWidth: 1, padding: 8, marginBottom: 10 }}
-                />
+                /> */}
                 <TextInput
                     placeholder="Type a message"
                     value={newMessage}
                     onChangeText={setNewMessage}
-                    style={{ borderWidth: 1, padding: 8, marginBottom: 10 }}
+                    // style={{ borderWidth: 1, padding: 8, marginBottom: 10 }}dasdasd
+                    className='border focus:outline-primary rounded-md p-2 text-black'
                 />
                 {/* <Button title="Send Message" onPress={handleSendMessage} /> */}
             </View>

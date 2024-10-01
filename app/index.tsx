@@ -29,7 +29,7 @@ export default function HomePage() {
         <View className="flex-1">
             {modal &&
                 <SignUp setModal={setModal} initialFlow={modal} />}
-            <SafeAreaView className="flex-1 bg-primary-dark mx-4 py-4">
+            <SafeAreaView className="flex-1 mx-4 py-4">
                 <View className="flex-1 flex-col min-h-[100vh]">
                     {/* Header */}
                     <View className="flex-row items-center justify-between py-2 px-4 lg:px-6">

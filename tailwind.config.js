@@ -8,6 +8,7 @@ module.exports = {
           DEFAULT: '#127475', // Example blue color
           alt: '#F5DFBB',
           light: '#0E9594',
+          dark: '#093a3b'
         },
         secondary: {
           DEFAULT: '#562C2C', // Example green color

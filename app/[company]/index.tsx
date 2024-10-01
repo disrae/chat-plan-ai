@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, SafeAreaView, Pressable } from 'react-native';
 import { AntDesign, FontAwesome } from '@expo/vector-icons'; // For icons, you can replace these if needed
 
-import { router, useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { colors } from '@/constants/Colors';
 import { shadow } from '@/constants/styles';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { useAuthActions } from '@convex-dev/auth/dist/react';
 import { AddProject } from '@/components/popups/AddProject';
-import { DataModel, Id } from '@/convex/_generated/dataModel';
+import { Id } from '@/convex/_generated/dataModel';
 import { AddConversation } from '@/components/popups/AddConversation';
 
 export type DashboardModals = {

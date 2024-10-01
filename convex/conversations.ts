@@ -58,7 +58,7 @@ export const addConversation = mutation({
     }
 });
 
-export const getConversationMessages = query({
+export const getMessages = query({
     args: { conversationId: v.id("conversations") },
     handler: async (ctx, { conversationId }) => {
         const messages = await ctx.db.query('messages')
