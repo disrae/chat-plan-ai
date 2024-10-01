@@ -89,13 +89,14 @@ export default function Chat() {
                     </Pressable>
                 </View>
                 <View className='flex-row justify-end pb-2'>
-                    <Link
-                        href={`/jump-to/${conversation?.secret}`}
+                    <Pressable
+                        // href={`/jump-to/${conversation?.secret}`}
+                        onPress={() => router.push(`/jump-to/${conversation?.secret}`)}
                         className='flex-row items-center px-3 bg-slate-200 py-2 mr-4 rounded'>
                         <Text className=' text font-medium text-right pl-2'>
                             {`/jump-to/${conversation?.secret}`}
                         </Text>
-                    </Link>
+                    </Pressable>
                 </View>
             </View>
 

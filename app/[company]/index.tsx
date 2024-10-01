@@ -30,7 +30,7 @@ export default function CompanyDashboard() {
     useEffect(() => {
         console.log(JSON.stringify({ dashboard }, null, 2));
         if (dashboard?.user.accountType === 'personal') {
-            // router.replace('/conversations');
+            router.replace('/conversations');
         }
         if (!user) {
             // router.replace('/');

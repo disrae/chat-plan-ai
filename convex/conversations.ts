@@ -87,3 +87,19 @@ export const getConversationBySecret = query({
         return conversation;
     },
 });
+
+export const addParticipant = mutation({
+    args: { secret: v.string() },
+    handler: async (ctx, { secret }) => {
+        const conversation = await ctx.db.query('conversations').withIndex('by_secret', q => (q.eq("secret", secret))).unique();
+        if (!conversation) { throw new Error("Conversation not found"); }
+        const userId = await getAuthUserId(ctx);
+        if (!userId) { throw new Error("Unauthorized, no user identity found"); }
+        const user = await ctx.db.get(userId);
+        if (!user) { throw new Error("User not found"); }
+        if (!conversation.participants.includes(userId)) {
+            await ctx.db.patch(conversation._id, { participants: [...conversation.participants, userId] });
+        }
+        return conversation._id;
+    }
+});
