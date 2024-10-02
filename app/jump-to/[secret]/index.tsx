@@ -39,7 +39,7 @@ export default function index() {
                 const conversationId = await addUserToConversation({ secret });
                 console.log(JSON.stringify({ conversationId }, null, 2));
 
-                // router.replace(`/conversations/${conversation?._id}`);
+                router.replace(`/conversations/${conversation?._id}`);
             }
         };
         handleSignedUp();
