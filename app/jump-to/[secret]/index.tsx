@@ -17,37 +17,40 @@ export default function index() {
     const router = useRouter();
     const { signIn } = useAuthActions();
     const [loading, setLoading] = useState<'signUp' | 'signIn' | 'verifying' | ''>('');
-    const [accountType, setAccountType] = useState<'business' | 'personal'>('business');
+    const [accountType, setAccountType] = useState<'business' | 'personal'>('personal');
     const [businessName, setBusinessName] = useState('');
     const [name, setName] = useState('');
     const [email, setEmail] = useState('' || 'danny.israel@gmail.com');
     const [password, setPassword] = useState('');
     const [emailSent, setEmailSent] = useState(false);
+    const [flow, setFlow] = useState('signUp' as 'signUp' | 'signIn');
     const [verificationCode, setVerificationCode] = useState('');
     const user = useQuery(api.users.currentUser);
-    const [flow, setFlow] = useState('signUp' as 'signUp' | 'signIn');
+    const conversation = useQuery(api.conversations.getConversationBySecret, { secret });
     const addUserToConversation = useMutation(api.conversations.addParticipant);
-    const conversationId = useQuery(api.conversations.getConversationBySecret, { secret }) as Id<'conversations'>;
-    const conversation = useQuery(api.conversations.getConversationById, { conversationId });
 
     console.log(JSON.stringify({ conversation }, null, 2));
 
-    // useEffect(() => {
-    //     const handleSignedUp = async () => {
-    //         if (!conversation) return null;
-    //         if (user) {
-    //             const conversationId = await addUserToConversation({ secret });
-    //             router.replace(`/conversations/${conversation?._id}`);
-    //         }
-    //     };
-    //     handleSignedUp();
-    // }, [user]);
+    useEffect(() => {
+        const handleSignedUp = async () => {
+            if (!conversation) return null;
+            if (user) {
+                console.log('Adding user to conversation');
+                const conversationId = await addUserToConversation({ secret });
+                console.log(JSON.stringify({ conversationId }, null, 2));
+
+                // router.replace(`/conversations/${conversation?._id}`);
+            }
+        };
+        handleSignedUp();
+    }, [user, conversation]);
 
 
     const { handleError, errors } = useZodErrorHandler();
 
     const handleSignUp = async () => {
         setLoading('signUp');
+        console.log(JSON.stringify({ email, password, flow, name, accountType, conversationIds: [], businessName }, null, 2));
         try {
             const result = await signIn("password", { email, password, flow, name, accountType, conversationIds: [], businessName });
             setEmailSent(true);
@@ -62,7 +65,7 @@ export default function index() {
         try {
             setLoading('verifying');
             await signIn("password", { email: email.toLowerCase(), code: verificationCode, password, flow: "email-verification" });
-            router.push(accountType === 'business' ? `/${businessName}` : '/conversations');
+            // router.push(accountType === 'business' ? `/${businessName}` : '/conversations');
         } catch (error) {
             handleError(error);
             setEmailSent(false);
@@ -79,21 +82,18 @@ export default function index() {
         }
         setLoading('');
     };
-    if (!user) return null; <SafeAreaView>
-        <Pressable className='p-4' onPress={router.back}>
-            <Text>Back</Text>
-        </Pressable>
-    </SafeAreaView>;
+
+    if (!conversation) return null;
     return (
-        <SafeAreaView className="flex-1 mx-4 py-4">
-            <ScrollView className="p-6 max-w-lg rounded-lg">
-                {conversation && <View className='py-2 gap-1'>
-                    <Text className='text-slate-800 text-lg font-medium'>You have been invited to join a conversation</Text>
-                    <Text>{`${conversation.businessName} has invited you to join the ${conversation.name} conversation as part of the ${conversation.projectName} project.`}</Text>
-                    <Text>If you alreadu have an account, sign up, otherwise sign in.</Text>
+        <SafeAreaView className="flex-1 mx-4 py-4 justify-center items-center">
+            <ScrollView className="p-6 max-w-lg rounded-lg bg-slate-50">
+                {conversation && <View className='py-4 gap-1'>
+                    <Text className='text-slate-800 text-lg font-bold'>You're invited:</Text>
+                    <Text>{`${conversation.ownerName} from ${conversation.businessName} has invited you to join the ${conversation.name} conversation as part of the ${conversation.projectName} project.`}</Text>
+                    <Text>If you already have an account, sign in, otherwise sign up.</Text>
                 </View>}
                 <View className="flex-row justify-between items-center">
-                    <Text className="text-xl font-bold">{flow === 'signUp' ? 'Sign Up' : 'Sign In'}
+                    <Text className="text-lg font-bold">{flow === 'signUp' ? 'Sign Up' : 'Sign In'}
                     </Text>
                 </View>
 

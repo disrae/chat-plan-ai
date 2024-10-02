@@ -67,7 +67,7 @@ export default function Chat() {
             {/* Header */}
             <View className='bg-primary-dark'>
                 <View className=' flex-row justify-between items-center px-4 '>
-                    <Pressable onPress={router.back} className='' hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                    <Pressable onPress={router.canGoBack() ? router.back : router.replace('/conversations')} className='' hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
                         <AntDesign name="arrowleft" size={24} color="white" />
                     </Pressable>
                     <View className='flex-1 py-2 pl-2'>

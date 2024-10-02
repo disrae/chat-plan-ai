@@ -24,7 +24,7 @@ export const getConversationById = query({
     args: { conversationId: v.id("conversations") },
     handler: async (ctx, { conversationId }) => {
         const userId = await getAuthUserId(ctx);
-        if (!userId) { throw new ConvexError("Unauthorized, no user identity found"); }
+        if (!userId) { return null; }
 
         const conversation = await ctx.db.get(conversationId);
         if (!conversation) { throw new ConvexError("Conversation not found"); }
@@ -81,18 +81,28 @@ export const addConversation = mutation({
         const user = await ctx.db.get(userId);
         if (!user) { throw new Error("User not found"); }
 
+        const businessDoc = await ctx.db.get(business);
+        if (!businessDoc) { throw new Error("Business not found"); }
+
+        const project = await ctx.db.get(projectId);
+        if (!project) { throw new Error("Project not found"); }
+
         const newConversation = await ctx.db.insert('conversations', {
             name,
             owner: userId,
+            ownerName: user.name,
             project: projectId,
+            projectName: project.name,
             business,
+            businessName: businessDoc.name,
             participants: [userId],
             secret: generateSecret(12)
         });
+        // Add the conversation to the user.
         await ctx.db.patch(userId, { conversationIds: [...user.conversationIds, newConversation] });
-        const project = await ctx.db.get(projectId);
-        if (!project) { throw new Error("Project not found"); }
+        // Add the conversation to the project.
         await ctx.db.patch(projectId, { conversations: [...project.conversations, newConversation] });
+
         return newConversation;
     }
 });
@@ -112,7 +122,7 @@ export const getConversationBySecret = query({
     handler: async (ctx, { secret }) => {
         const conversation = await ctx.db.query('conversations').withIndex('by_secret', q => (q.eq("secret", secret))).unique();
         if (!conversation) { throw new Error("Conversation not found"); }
-        return conversation._id;
+        return conversation;
     },
 });
 
@@ -127,6 +137,9 @@ export const addParticipant = mutation({
         if (!user) { throw new Error("User not found"); }
         if (!conversation.participants.includes(userId)) {
             await ctx.db.patch(conversation._id, { participants: [...conversation.participants, userId] });
+        }
+        if (!user.conversationIds.includes(conversation._id)) {
+            await ctx.db.patch(user._id, { conversationIds: [...user.conversationIds, conversation._id] });
         }
         return conversation._id;
     }
