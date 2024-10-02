@@ -39,7 +39,7 @@ export default function CompanyDashboard() {
 
     useEffect(() => {
         if (!user) {
-            // router.replace('/');
+            router.replace('/');
         }
     }, [user]);
 
