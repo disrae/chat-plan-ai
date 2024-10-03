@@ -69,8 +69,8 @@ export default function HomePage() {
                             </Text>
                             <View className="h-12"></View>
                             <View className="justify-center items-center">
-                                <Pressable className="bg-primary px-16 py-4 rounded-md" onPress={() => setModal('signUp')}>
-                                    <Text className="text-white text-2xl font-medium">Sign Up</Text>
+                                <Pressable className="bg-primary px-6 py-2 rounded-md" onPress={() => setModal('signUp')}>
+                                    <Text className="text-white text-xl font-semibold">Sign Up</Text>
                                 </Pressable>
                             </View>
                         </View>
