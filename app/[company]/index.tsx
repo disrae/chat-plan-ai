@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, SafeAreaView, Pressable } from 'react-native';
-import { AntDesign, FontAwesome } from '@expo/vector-icons';
+import { AntDesign, FontAwesome, SimpleLineIcons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { colors } from '@/constants/Colors';
 import { shadow } from '@/constants/styles';
@@ -28,6 +28,7 @@ export default function CompanyDashboard() {
     const [modal, setModal] = useState<DashboardModals>({ type: '' });
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredProjects, setFilteredProjects] = useState(business?.projects || []);
+    const [popup, setPopup] = useState<{ type: 'settings' | ''; }>({ type: '' });
 
     useEffect(() => {
         if (dashboard?.user.accountType === 'personal') {
@@ -116,20 +117,37 @@ export default function CompanyDashboard() {
     };
 
     return (
-        <View className="flex-1">
+        <View className="flex-1 bg-gray-50">
             {modal.type === 'addProject' && <AddProject setModal={setModal} />}
             {modal.type === 'addConversation' && <AddConversation setModal={setModal} projectId={modal.payload?.projectId} />}
             <SafeAreaView className="flex-1 mx-4 md:my-4 items-center gap-y-4">
                 <View className='flex-1 w-full max-w-2xl'>
 
-                    {/* Logout Button */}
+                    {/* Settings Button */}
                     <View className='flex-row justify-end'>
                         <Pressable
-                            onPress={signOut}
-                            className="bg-slate-200 shadow px-4 py-2 rounded">
-                            <Text className="text-xs font-medium">Logout</Text>
+                            onPress={() => setPopup({ type: popup.type === 'settings' ? '' : 'settings' })}
+                            style={[popup.type === 'settings' ? {} : shadow]}
+                            className={`${popup.type === 'settings' ? 'bg-slate-200' : 'bg-slate-100'} shadow px-2 py-2 rounded-full`}
+                        >
+                            <AntDesign name="setting" size={24} color="black" />
                         </Pressable>
                     </View>
+                    {popup.type === 'settings' &&
+                        <View className='absolute  right-8 top-8 bg-gray-100 rounded shadow z-10'>
+                            <View className='p-2 border-b border-gray-400'>
+                                <Text className="text-xs font-bold">My Account</Text>
+                            </View>
+                            <Pressable onPress={() => null} className='flex-row items-center p-2 border-b border-gray-300'>
+                                <AntDesign name="setting" size={12} color="black" />
+                                <Text className="text-xs pl-1">Settings</Text>
+                            </Pressable>
+                            <Pressable onPress={signOut} className='flex-row items-center p-2 '>
+                                <SimpleLineIcons name="logout" size={12} color="black" />
+                                <Text className="text-xs pl-1">Log out</Text>
+                            </Pressable>
+                        </View>
+                    }
 
                     {/* Company Info */}
                     <View className="mb-4">
@@ -167,7 +185,7 @@ export default function CompanyDashboard() {
                         contentContainerStyle={{ paddingBottom: 10 }}
                     />
                 </View>
-            </SafeAreaView>
-        </View>
+            </SafeAreaView >
+        </View >
     );
 }
