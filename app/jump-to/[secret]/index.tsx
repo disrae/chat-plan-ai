@@ -20,7 +20,7 @@ export default function index() {
     const [accountType, setAccountType] = useState<'business' | 'personal'>('personal');
     const [businessName, setBusinessName] = useState('');
     const [name, setName] = useState('');
-    const [email, setEmail] = useState('' || 'danny.israel@gmail.com');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [emailSent, setEmailSent] = useState(false);
     const [flow, setFlow] = useState('signUp' as 'signUp' | 'signIn');
