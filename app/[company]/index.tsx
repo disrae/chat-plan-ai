@@ -10,6 +10,7 @@ import { useAuthActions } from '@convex-dev/auth/dist/react';
 import { AddProject } from '@/components/popups/AddProject';
 import { Id } from '@/convex/_generated/dataModel';
 import { AddConversation } from '@/components/popups/AddConversation';
+import Fuse from 'fuse.js'; // Import fuse.js
 
 export type DashboardModals = {
     type: '' | 'addProject' | 'addConversation',
@@ -25,6 +26,8 @@ export default function CompanyDashboard() {
     const business = dashboard?.businesses?.[0];
     const [expandedProjects, setExpandedProjects] = useState<Array<Id<'projects'>>>([]);
     const [modal, setModal] = useState<DashboardModals>({ type: '' });
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filteredProjects, setFilteredProjects] = useState(business?.projects || []);
 
     useEffect(() => {
         if (dashboard?.user.accountType === 'personal') {
@@ -34,6 +37,22 @@ export default function CompanyDashboard() {
             router.replace('/');
         }
     }, [dashboard?.user, user]);
+
+    // Set up Fuse.js options
+    const fuse = new Fuse(business?.projects || [], {
+        keys: ['name'],
+        threshold: 0.3, // Adjust this to control fuzzy matching sensitivity
+    });
+
+    useEffect(() => {
+        // Filter projects based on search query
+        if (searchQuery.trim()) {
+            const results = fuse.search(searchQuery);
+            setFilteredProjects(results.map(result => result.item));
+        } else {
+            setFilteredProjects(business?.projects || []);
+        }
+    }, [searchQuery, business?.projects]);
 
     const toggleProject = (projectId: Id<'projects'>) => {
         setExpandedProjects(prev =>
@@ -132,13 +151,15 @@ export default function CompanyDashboard() {
                         <TextInput
                             className="bg-white p-2 mb-4 border rounded-lg"
                             placeholder="Search projects..."
+                            value={searchQuery}
+                            onChangeText={setSearchQuery}
                             keyboardType="default"
                         />
                     )}
 
                     {/* Project List */}
                     <FlatList
-                        data={business?.projects}
+                        data={filteredProjects}
                         className='mb-10 '
                         showsVerticalScrollIndicator={false}
                         keyExtractor={item => item?._id || ''}
