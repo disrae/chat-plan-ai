@@ -10,6 +10,7 @@ import { HomeScreenModals } from '@/app';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { ConvexError } from 'convex/values';
 import { useZodErrorHandler } from '@/hooks/useZodErrorHandler';
+import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 
 type Props = {
     setModal: Dispatch<React.SetStateAction<HomeScreenModals>>;
@@ -28,6 +29,7 @@ export function SignUp({
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [emailSent, setEmailSent] = useState(false);
     const [verificationCode, setVerificationCode] = useState('');
     const user = useQuery(api.users.currentUser);
@@ -164,13 +166,21 @@ export function SignUp({
 
                         <View className="">
                             <Text className="text-lg mb-1">Password</Text>
-                            <TextInput
-                                value={password}
-                                onChangeText={setPassword}
-                                className="border focus:outline-primary rounded-md p-2"
-                                placeholder="Enter your password"
-                                secureTextEntry
-                            />
+                            <View className='flex-row items-center gap-1'>
+                                <TextInput
+                                    value={password}
+                                    onChangeText={setPassword}
+                                    className="border flex-1 focus:outline-primary rounded-md p-2"
+                                    placeholder="Enter your password"
+                                    secureTextEntry={!showPassword}
+
+                                />
+                                <Pressable className='' onPress={() => setShowPassword(!showPassword)}>
+                                    {showPassword
+                                        ? <MaterialCommunityIcons name="eye-outline" onPress={() => setShowPassword(!showPassword)} size={24} color="black" />
+                                        : <MaterialCommunityIcons name="eye-remove-outline" onPress={() => setShowPassword(!showPassword)} size={24} color="black" />}
+                                </Pressable>
+                            </View>
                         </View>
 
                         {!!errors.length
