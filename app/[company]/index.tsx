@@ -118,7 +118,6 @@ export default function CompanyDashboard() {
             {modal.type === 'addConversation' && <AddConversation setModal={setModal} projectId={modal.payload?.projectId} />}
             <SafeAreaView className="flex-1 mx-4 md:my-4 items-center gap-y-4">
                 <View className='flex-1 w-full max-w-2xl'>
-
                     {/* Settings Button */}
                     <View className='flex-row justify-end'>
                         <Pressable
@@ -131,19 +130,19 @@ export default function CompanyDashboard() {
                     </View>
                     {popup.type === 'settings' &&
                         <>
-                            {/* Overlay Pressable to close the settings */}
                             <Pressable
-                                className="absolute -top-20 -left-20 -right-20 bottom-20 inset-0 z-10 "
-                                style={{ backgroundColor: 'rgba(0, 0, 0, 0.03)' }} // Adding a dimmed effect
+                                className="absolute -top-80 -left-80 -right-80 bottom-80 inset-0 z-10 "
+                                style={{ backgroundColor: 'rgba(0, 0, 0, 0.01)' }}
                                 onPress={() => setPopup({ type: '' })}
                             />
-
-                            {/* Settings Popup */}
                             <View className='absolute right-8 top-10 bg-gray-50 rounded shadow z-20'>
                                 <View className='p-2 border-b border-gray-400 rounded-t'>
                                     <Text className="text-xs font-bold">My Account</Text>
                                 </View>
-                                <Pressable onPress={() => null} className='flex-row items-center p-2 border-b border-gray-300'>
+                                <Pressable
+                                    onPress={() => router.push(`/${company}/settings`)}
+                                    className='flex-row items-center p-2 border-b border-gray-300'
+                                >
                                     <AntDesign name="setting" size={12} color="black" />
                                     <Text className="text-xs pl-1">Settings</Text>
                                 </Pressable>
