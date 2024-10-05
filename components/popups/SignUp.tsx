@@ -35,6 +35,8 @@ export function SignUp({
     const user = useQuery(api.users.currentUser);
     const [flow, setFlow] = useState(initialFlow);
 
+    console.log(JSON.stringify({ user }, null, 2));
+
     const { handleError, errors } = useZodErrorHandler();
 
     const handleSignUp = async () => {

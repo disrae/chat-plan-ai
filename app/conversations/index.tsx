@@ -26,10 +26,9 @@ export default function CompanyDashboard() {
     const business = dashboard?.businesses?.[0];
     const [modal, setModal] = useState<DashboardModals>({ type: '' });
 
-    console.log(JSON.stringify({ dashboard, user }, null, 2));
     useEffect(() => {
-        if (!user) {
-            // router.replace('/');
+        if (user === null) {
+            router.replace('/');
         }
     }, [user]);
 
@@ -54,15 +53,6 @@ export default function CompanyDashboard() {
                         <Text className="text-3xl font-bold mt-2">{company}</Text>
                         <Text className="text-xl font-semibold">Projects & Conversations</Text>
                     </View>
-
-                    {/* New Project Button */}
-                    {/* <Pressable
-                        onPress={() => setModal({ type: 'addProject' })}
-                        className="flex-row bg-primary py-2 px-2 rounded-lg items-center mb-8"
-                    >
-                        <Text className='text-white pr-1 -mt-[2px] text-xl font-medium '>+</Text>
-                        <Text className="text-white font-medium ">New Project</Text>
-                    </Pressable> */}
 
                     {/* Search Input */}
                     {!!business?.projects.length && <TextInput

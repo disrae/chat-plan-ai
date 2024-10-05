@@ -34,7 +34,8 @@ export default function CompanyDashboard() {
         if (dashboard?.user.accountType === 'personal') {
             router.replace('/conversations');
         }
-        if (!user) {
+
+        if (user === null) {
             router.replace('/');
         }
     }, [dashboard?.user, user]);
@@ -134,8 +135,8 @@ export default function CompanyDashboard() {
                         </Pressable>
                     </View>
                     {popup.type === 'settings' &&
-                        <View className='absolute  right-8 top-8 bg-gray-100 rounded shadow z-10'>
-                            <View className='p-2 border-b border-gray-400'>
+                        <View className='absolute right-8 top-8 bg-gray-50 rounded shadow z-10'>
+                            <View className='p-2 border-b border-gray-400 rounded-t'>
                                 <Text className="text-xs font-bold">My Account</Text>
                             </View>
                             <Pressable onPress={() => null} className='flex-row items-center p-2 border-b border-gray-300'>
