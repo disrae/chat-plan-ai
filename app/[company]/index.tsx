@@ -40,14 +40,9 @@ export default function CompanyDashboard() {
         }
     }, [dashboard?.user, user]);
 
-    // Set up Fuse.js options
-    const fuse = new Fuse(business?.projects || [], {
-        keys: ['name'],
-        threshold: 0.3, // Adjust this to control fuzzy matching sensitivity
-    });
+    const fuse = new Fuse(business?.projects || [], { keys: ['name'], threshold: 0.3 });
 
     useEffect(() => {
-        // Filter projects based on search query
         if (searchQuery.trim()) {
             const results = fuse.search(searchQuery);
             setFilteredProjects(results.map(result => result.item));
@@ -135,19 +130,29 @@ export default function CompanyDashboard() {
                         </Pressable>
                     </View>
                     {popup.type === 'settings' &&
-                        <View className='absolute right-8 top-8 bg-gray-50 rounded shadow z-10'>
-                            <View className='p-2 border-b border-gray-400 rounded-t'>
-                                <Text className="text-xs font-bold">My Account</Text>
+                        <>
+                            {/* Overlay Pressable to close the settings */}
+                            <Pressable
+                                className="absolute -top-20 -left-20 -right-20 bottom-20 inset-0 z-10 "
+                                style={{ backgroundColor: 'rgba(0, 0, 0, 0.03)' }} // Adding a dimmed effect
+                                onPress={() => setPopup({ type: '' })}
+                            />
+
+                            {/* Settings Popup */}
+                            <View className='absolute right-8 top-10 bg-gray-50 rounded shadow z-20'>
+                                <View className='p-2 border-b border-gray-400 rounded-t'>
+                                    <Text className="text-xs font-bold">My Account</Text>
+                                </View>
+                                <Pressable onPress={() => null} className='flex-row items-center p-2 border-b border-gray-300'>
+                                    <AntDesign name="setting" size={12} color="black" />
+                                    <Text className="text-xs pl-1">Settings</Text>
+                                </Pressable>
+                                <Pressable onPress={signOut} className='flex-row items-center p-2 '>
+                                    <SimpleLineIcons name="logout" size={12} color="black" />
+                                    <Text className="text-xs pl-1">Log out</Text>
+                                </Pressable>
                             </View>
-                            <Pressable onPress={() => null} className='flex-row items-center p-2 border-b border-gray-300'>
-                                <AntDesign name="setting" size={12} color="black" />
-                                <Text className="text-xs pl-1">Settings</Text>
-                            </Pressable>
-                            <Pressable onPress={signOut} className='flex-row items-center p-2 '>
-                                <SimpleLineIcons name="logout" size={12} color="black" />
-                                <Text className="text-xs pl-1">Log out</Text>
-                            </Pressable>
-                        </View>
+                        </>
                     }
 
                     {/* Company Info */}
