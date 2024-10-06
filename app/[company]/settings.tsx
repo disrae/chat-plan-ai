@@ -1,7 +1,7 @@
 import { api } from '@/convex/_generated/api';
 import { useQuery } from 'convex/react';
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, SafeAreaView, ScrollView, Pressable } from 'react-native';
 
 export default function AccountSettings() {
     const [name, setName] = useState('John Doe');
@@ -54,7 +54,7 @@ export default function AccountSettings() {
                         value={email}
                         onChangeText={setEmail}
                         placeholder="Email"
-                        keyboardType="email-address"
+                        inputMode='email'
                     />
                     <Text>Company</Text>
                     <TextInput
@@ -74,9 +74,9 @@ export default function AccountSettings() {
                     /> */}
 
                     {/* Update Button */}
-                    <TouchableOpacity className="bg-black py-3 rounded-md items-center mt-4">
+                    <Pressable className="bg-black py-3 rounded-md items-center mt-4">
                         <Text className="text-white text-base font-bold">Update Profile</Text>
-                    </TouchableOpacity>
+                    </Pressable>
                 </View>
             </ScrollView>
         </SafeAreaView>

@@ -58,7 +58,7 @@ export default function CompanyDashboard() {
                     {!!business?.projects.length && <TextInput
                         className="bg-white p-2 mb-4 border rounded-lg"
                         placeholder="Search conversations..."
-                        keyboardType="default"
+                        inputMode='search'
                     />}
 
                     {/* Conversation List */}

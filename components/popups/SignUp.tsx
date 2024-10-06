@@ -158,7 +158,7 @@ export function SignUp({
                             <TextInput
                                 value={email}
                                 onChangeText={setEmail}
-                                keyboardType="email-address"
+                                inputMode='email'
                                 autoCapitalize="none"
                                 autoCorrect={false}
                                 className="border focus:outline-primary rounded-md p-2"
