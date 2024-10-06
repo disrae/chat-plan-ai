@@ -1,16 +1,15 @@
-import React, { Dispatch, useCallback, useState } from 'react';
+import React, { Dispatch, useState } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, ActivityIndicator } from 'react-native';
 import { Popup } from '../utils/Popup';
 import { colors } from '@/constants/Colors';
 import { useRouter } from 'expo-router';
 import { shadow } from '@/constants/styles';
-import { useMutation, useQuery } from 'convex/react';
+import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { HomeScreenModals } from '@/app';
 import { useAuthActions } from '@convex-dev/auth/react';
-import { ConvexError } from 'convex/values';
 import { useZodErrorHandler } from '@/hooks/useZodErrorHandler';
-import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 type Props = {
     setModal: Dispatch<React.SetStateAction<HomeScreenModals>>;
@@ -32,10 +31,11 @@ export function SignUp({
     const [showPassword, setShowPassword] = useState(false);
     const [emailSent, setEmailSent] = useState(false);
     const [verificationCode, setVerificationCode] = useState('');
+    const [isPasswordFocused, setIsPasswordFocused] = useState(false);
     const user = useQuery(api.users.currentUser);
     const [flow, setFlow] = useState(initialFlow);
 
-    console.log(JSON.stringify({ user }, null, 2));
+    console.log({ isPasswordFocused });
 
     const { handleError, errors } = useZodErrorHandler();
 
@@ -166,28 +166,30 @@ export function SignUp({
                             />
                         </View>
 
-                        <View className="">
+                        <View className="mb-4">
                             <Text className="text-lg mb-1">Password</Text>
-                            <View className='flex-row items-center gap-1'>
+                            <View className={`flex-row items-center border rounded-md ${isPasswordFocused ? 'outline-primary outline border-primary' : ''}`}>
                                 <TextInput
                                     value={password}
                                     onChangeText={setPassword}
-                                    className="border flex-1 focus:outline-primary rounded-md p-2"
+                                    className="flex-1 p-2 focus:outline-none"
                                     placeholder="Enter your password"
                                     secureTextEntry={!showPassword}
-
+                                    onFocus={() => setIsPasswordFocused(true)}
+                                    onBlur={() => setIsPasswordFocused(false)}
                                 />
-                                <Pressable className='' onPress={() => setShowPassword(!showPassword)}>
-                                    {showPassword
-                                        ? <MaterialCommunityIcons name="eye-outline" onPress={() => setShowPassword(!showPassword)} size={24} color="black" />
-                                        : <MaterialCommunityIcons name="eye-remove-outline" onPress={() => setShowPassword(!showPassword)} size={24} color="black" />}
+                                <Pressable className=' px-2 py-1' onPress={() => setShowPassword(!showPassword)}>
+                                    {/* {showPassword
+                                        ? <MaterialCommunityIcons name="eye-outline" size={24} color="black" />
+                                        : <MaterialCommunityIcons name="eye-remove-outline" size={24} color="black" />} */}
+                                    <Text className='text-sm font-bold text-gray-500'>{showPassword ? 'Hide' : 'Show'}</Text>
                                 </Pressable>
                             </View>
                         </View>
 
                         {!!errors.length
                             ? <View className='py-4 gap-y-4 justify-center '>
-                                {errors.map(e => <Text className="text-red-500">{e}</Text>)}
+                                {errors.map((e, index) => <Text key={index} className="text-red-500">{e}</Text>)}
                             </View>
                             : <View className='h-12' />}
 
