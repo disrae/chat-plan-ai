@@ -31,13 +31,8 @@ export default function CompanyDashboard() {
     const [popup, setPopup] = useState<{ type: 'settings' | ''; }>({ type: '' });
 
     useEffect(() => {
-        if (dashboard?.user.accountType === 'personal') {
-            router.replace('/conversations');
-        }
-
-        if (user === null) {
-            router.replace('/');
-        }
+        if (dashboard?.user.accountType === 'personal') { router.replace('/conversations'); }
+        if (user === null) { router.replace('/'); }
     }, [dashboard?.user, user]);
 
     const fuse = new Fuse(business?.projects || [], { keys: ['name'], threshold: 0.3 });
@@ -117,7 +112,7 @@ export default function CompanyDashboard() {
             {modal.type === 'addProject' && <AddProject setModal={setModal} />}
             {modal.type === 'addConversation' && <AddConversation setModal={setModal} projectId={modal.payload?.projectId} />}
             <SafeAreaView className="flex-1 mx-4 md:my-4 items-center gap-y-4">
-                <View className='flex-1 w-full max-w-2xl'>
+                <View className='flex-1 w-full max-w-2xl pt-4'>
                     {/* Settings Button */}
                     <View className='flex-row justify-end'>
                         <Pressable
@@ -137,18 +132,18 @@ export default function CompanyDashboard() {
                             />
                             <View className='absolute right-8 top-10 bg-gray-50 rounded shadow z-20'>
                                 <View className='p-2 border-b border-gray-400 rounded-t'>
-                                    <Text className="text-xs font-bold">My Account</Text>
+                                    <Text className="font-bold">My Account</Text>
                                 </View>
                                 <Pressable
                                     onPress={() => router.push(`/${company}/settings`)}
-                                    className='flex-row items-center p-2 border-b border-gray-300'
+                                    className='flex-row items-center hover:bg-gray-100 p-2 border-b border-gray-300'
                                 >
                                     <AntDesign name="setting" size={12} color="black" />
-                                    <Text className="text-xs pl-1">Settings</Text>
+                                    <Text className="pl-2">Settings</Text>
                                 </Pressable>
-                                <Pressable onPress={signOut} className='flex-row items-center p-2 '>
+                                <Pressable onPress={signOut} className='flex-row items-center hover:bg-gray-100 p-2 '>
                                     <SimpleLineIcons name="logout" size={12} color="black" />
-                                    <Text className="text-xs pl-1">Log out</Text>
+                                    <Text className="pl-2">Log out</Text>
                                 </Pressable>
                             </View>
                         </>

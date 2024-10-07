@@ -77,3 +77,26 @@ export const getUserDashboardData = query({
         return { user, businesses: validBusinesses };
     },
 });
+
+export const updateUser = mutation({
+    args: { name: v.string(), email: v.string(), businessName: v.string() },
+    handler: async (ctx, args) => {
+        const userId = await getAuthUserId(ctx);
+        if (!userId) { return null; }
+
+        const user = await ctx.db.get(userId);
+        if (!user) {
+            return null;
+        }
+
+        // Handle the conversations that the user owns, 
+        // update the ownerName and the businessName.
+
+        // Update the name in the business table.
+
+
+
+        // Handle user fields
+
+    },
+});
