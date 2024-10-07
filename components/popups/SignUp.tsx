@@ -35,8 +35,6 @@ export function SignUp({
     const user = useQuery(api.users.currentUser);
     const [flow, setFlow] = useState(initialFlow);
 
-    console.log({ isPasswordFocused });
-
     const { handleError, errors } = useZodErrorHandler();
 
     const handleSignUp = async () => {
@@ -179,9 +177,6 @@ export function SignUp({
                                     onBlur={() => setIsPasswordFocused(false)}
                                 />
                                 <Pressable className=' px-2 py-1' onPress={() => setShowPassword(!showPassword)}>
-                                    {/* {showPassword
-                                        ? <MaterialCommunityIcons name="eye-outline" size={24} color="black" />
-                                        : <MaterialCommunityIcons name="eye-remove-outline" size={24} color="black" />} */}
                                     <Text className='text-sm font-bold text-gray-500'>{showPassword ? 'Hide' : 'Show'}</Text>
                                 </Pressable>
                             </View>

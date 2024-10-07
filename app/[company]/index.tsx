@@ -68,7 +68,7 @@ export default function CompanyDashboard() {
                 className={`border ${!isSelected ? 'border-primary bg-white shadow' : ""} rounded-lg p-2 py-2 my-2`}
                 style={[!isSelected ? shadow : {}]}
             >
-                <TouchableOpacity
+                <Pressable
                     className="flex-row items-center"
                     onPress={() => toggleProject(project._id)}
                     hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -80,7 +80,7 @@ export default function CompanyDashboard() {
                     <View className=''>
                         <Text className="text-sm font-medium">{project.name}</Text>
                     </View>
-                </TouchableOpacity>
+                </Pressable>
 
                 {isSelected && (
                     <View className="pl-0 mt-2 space-y-4">
@@ -176,7 +176,7 @@ export default function CompanyDashboard() {
                             placeholder="Search projects..."
                             value={searchQuery}
                             onChangeText={setSearchQuery}
-                            keyboardType="default"
+                            inputMode='text'
                         />
                     )}
 
