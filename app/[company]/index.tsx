@@ -10,7 +10,7 @@ import { useAuthActions } from '@convex-dev/auth/dist/react';
 import { AddProject } from '@/components/popups/AddProject';
 import { Id } from '@/convex/_generated/dataModel';
 import { AddConversation } from '@/components/popups/AddConversation';
-import Fuse from 'fuse.js'; // Import fuse.js
+import Fuse from 'fuse.js';
 
 export type DashboardModals = {
     type: '' | 'addProject' | 'addConversation',
@@ -29,6 +29,7 @@ export default function CompanyDashboard() {
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredProjects, setFilteredProjects] = useState(business?.projects || []);
     const [popup, setPopup] = useState<{ type: 'settings' | ''; }>({ type: '' });
+    console.log(JSON.stringify({ business }, null, 2));
 
     useEffect(() => {
         if (dashboard?.user.accountType === 'personal') { router.replace('/conversations'); }

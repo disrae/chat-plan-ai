@@ -1,8 +1,9 @@
 import { Header } from '@/components/navigation/Header';
 import { colors } from '@/constants/Colors';
 import { api } from '@/convex/_generated/api';
+import { useStore } from '@/hooks/useStore';
 import { AntDesign } from '@expo/vector-icons';
-import { useQuery } from 'convex/react';
+import { useQuery, useMutation } from 'convex/react';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, SafeAreaView, ScrollView, Pressable, ActivityIndicator } from 'react-native';
@@ -10,11 +11,16 @@ import { View, Text, TextInput, SafeAreaView, ScrollView, Pressable, ActivityInd
 export default function AccountSettings() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
-    const [company, setCompany] = useState('');
+    const [businessName, setBusinessName] = useState('');
     const user = useQuery(api.users.currentUser);
     const [tab, setTab] = useState<'profile' | 'notifications'>('profile');
+    const [isUpdating, setIsUpdating] = useState(false);
+    const { successMessage, errorMessage, setSuccessMessage, setErrorMessage, clearMessages } = useStore();
+    const updateUser = useMutation(api.users.updateUser);
+    let timer: NodeJS.Timeout | null = null;
 
-    console.log(JSON.stringify({ user }, null, 2));
+    console.log(JSON.stringify({ successMessage, errorMessage }, null, 2));
+
     const handleBack = () => {
         if (!user) return;
         if (router.canGoBack()) return router.back();
@@ -26,9 +32,42 @@ export default function AccountSettings() {
         if (user === null) router.replace('/');
         if (!user) return;
         setEmail(user.email || '');
-        setCompany(user.businessName || '');
+        setBusinessName(user.businessName || '');
         setName(user.name || '');
     }, [user]);
+
+    useEffect(() => {
+        if (successMessage || errorMessage) {
+            if (timer) clearTimeout(timer);
+            timer = setTimeout(() => {
+                clearMessages();
+            }, 4000);
+            return () => {
+                if (timer) clearTimeout(timer);
+            };
+        }
+    }, [successMessage, errorMessage, clearMessages]);
+
+    const handleUpdateProfile = async () => {
+        console.log('triggered');
+        if (!user) return;
+        setIsUpdating(true);
+        try {
+            const result = await updateUser({ name, email, businessName });
+            if (result.success) {
+                setSuccessMessage('Profile updated successfully!');
+                if (user.businessName !== businessName) {
+                    router.replace(`/${businessName}/settings`);
+                }
+            }
+        } catch (error: any) {
+            console.log(error);
+            console.error('Failed to update user:', error);
+            setErrorMessage(error.message || 'Failed to update profile. Please try again.');
+        } finally {
+            setIsUpdating(false);
+        }
+    };
 
     return (
         <SafeAreaView className='flex-1 items-center'>
@@ -92,8 +131,8 @@ export default function AccountSettings() {
                         <Text>Company</Text>
                         <TextInput
                             className="h-10 border border-gray-300 rounded-md px-2 mb-4 bg-white"
-                            value={company}
-                            onChangeText={setCompany}
+                            value={businessName}
+                            onChangeText={setBusinessName}
                             placeholder="Company"
                         />
                     </View>}
@@ -105,9 +144,31 @@ export default function AccountSettings() {
                         <Text className="text-sm text-gray-600 mb-4">Manage your notifications preferences here.</Text>
                     </View>}
 
+                {/* Success Message */}
+                <View className="h-12 justify-center items-center">
+                    {!!successMessage && (
+                        <Text className="text-center text-green-700">
+                            {successMessage}
+                        </Text>
+                    )}
+                    {!!errorMessage && (
+                        <Text className="text-center text-red-500">
+                            {errorMessage}
+                        </Text>
+                    )}
+                </View>
+
                 {/* Update Button */}
-                <Pressable className="bg-primary py-3 rounded-md items-center mt-4">
-                    <Text className="text-white text-base font-bold">Update Profile</Text>
+                <Pressable
+                    className={`bg-primary py-3 rounded-md items-center mx-4 ${isUpdating ? 'opacity-50' : ''}`}
+                    onPress={handleUpdateProfile}
+                    disabled={isUpdating}
+                >
+                    {isUpdating ? (
+                        <ActivityIndicator color="white" />
+                    ) : (
+                        <Text className="text-white text-base font-bold">Update Profile</Text>
+                    )}
                 </Pressable>
             </ScrollView>
         </SafeAreaView >

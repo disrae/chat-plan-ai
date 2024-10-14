@@ -22,7 +22,8 @@ export default defineSchema({
         name: v.string(),
         projects: v.array(v.id("projects")),
     })
-        .index("by_ownerId", ["ownerId"]),
+        .index("by_ownerId", ["ownerId"])
+        .index("by_name", ["name"]),
     projects: defineTable({
         owner: v.id("users"),
         businessId: v.id("businesses"),
