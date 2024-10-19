@@ -102,41 +102,43 @@ export default function CompanyDashboard() {
         }
     }
     useEffect(() => {
-        registerForPushNotificationsAsync()
-            .then(token => {
-                if (token) {
-                    setExpoPushToken(token);
-                    updateUser({ pushToken: token })
-                        .catch(error => console.error('Failed to update user push token:', error));
-                }
-            })
-            .catch((error: any) => {
-                console.error('Failed to get push token:', error);
-                setExpoPushToken(`${error}`);
+        if (Platform.OS !== 'web') {
+            registerForPushNotificationsAsync()
+                .then(token => {
+                    if (token) {
+                        setExpoPushToken(token);
+                        updateUser({ pushToken: token })
+                            .catch(error => console.error('Failed to update user push token:', error));
+                    }
+                })
+                .catch((error: any) => {
+                    console.error('Failed to get push token:', error);
+                    setExpoPushToken(`${error}`);
+                });
+
+            notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+                setNotification(notification);
             });
 
-        notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-            setNotification(notification);
-        });
-
-        responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-            console.log(response);
-            const data = response.notification.request.content.data;
-            if (data.conversationId) {
-                if (user?.accountType === 'business' && data.businessName && data.projectName) {
-                    router.push(`/${data.businessName}/${data.projectName}/${data.conversationId}`);
-                } else {
-                    router.push(`/conversations/${data.conversationId}`);
+            responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+                console.log(response);
+                const data = response.notification.request.content.data;
+                if (data.conversationId) {
+                    if (user?.accountType === 'business' && data.businessName && data.projectName) {
+                        router.push(`/${data.businessName}/${data.projectName}/${data.conversationId}`);
+                    } else {
+                        router.push(`/conversations/${data.conversationId}`);
+                    }
                 }
-            }
-        });
+            });
 
-        return () => {
-            notificationListener.current &&
-                Notifications.removeNotificationSubscription(notificationListener.current);
-            responseListener.current &&
-                Notifications.removeNotificationSubscription(responseListener.current);
-        };
+            return () => {
+                notificationListener.current &&
+                    Notifications.removeNotificationSubscription(notificationListener.current);
+                responseListener.current &&
+                    Notifications.removeNotificationSubscription(responseListener.current);
+            };
+        }
     }, [user]);
     useEffect(() => {
         if (dashboard?.user.accountType === 'personal') { router.replace('/conversations'); }

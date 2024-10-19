@@ -40,6 +40,15 @@
         "projectId": "49259892-9821-4d32-987e-40c26075d268"
       }
     },
-    "owner": "disrae"
+    "owner": "disrae",
+    "notification": {
+      "color": "#ffffff",
+      "iosDisplayInForeground": true,
+      "androidMode": "default",
+      "androidCollapsedTitle": "#{unread_notifications} new messages"
+    },
+    "webPushNotifications": {
+      "publicKey": "BBwKIFchI-4t_nhyCm1TGy-yex5ehyLXNO1h6sQRNk5fVQ6hf6yoHLOGWa3ri9oG1sELMRJE8TDaTFiJHTGq6iI"
+    }
   }
 }

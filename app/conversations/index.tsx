@@ -38,20 +38,20 @@ export default function Conversations() {
     useEffect(() => {
         if (user === null) {
             router.replace('/');
-        } else if (user) {
+        } else if (user && Platform.OS !== 'web') {
             registerForPushNotificationsAsync().then(token => updateUserPushToken(token));
+
+            notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+                // console.log(notification);
+            });
+
+            responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+                const conversationId = response.notification.request.content.data?.conversationId;
+                if (conversationId) {
+                    router.push(`/conversations/${conversationId}`);
+                }
+            });
         }
-
-        notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-            // console.log(notification);
-        });
-
-        responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-            const conversationId = response.notification.request.content.data?.conversationId;
-            if (conversationId) {
-                router.push(`/conversations/${conversationId}`);
-            }
-        });
 
         return () => {
             Notifications.removeNotificationSubscription(notificationListener.current!);
