@@ -20,6 +20,7 @@ export default Password<DataModel>({
             businesses: params.businesses as Id<"businesses">[] | null,
             businessName: params.businessName as string | null,
             conversationIds: params.conversationIds as Id<"conversations">[],
+            pushTokens: params.pushTokens as string[],
         };
     },
     verify: ResendOTP

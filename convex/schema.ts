@@ -16,6 +16,7 @@ export default defineSchema({
         businesses: v.union(v.array(v.id("businesses")), v.null()),
         businessName: v.union(v.string(), v.null()),
         conversationIds: v.array(v.id("conversations")),
+        pushTokens: v.array(v.string()),
     }).index("email", ["email"]),
     businesses: defineTable({
         ownerId: v.id("users"),

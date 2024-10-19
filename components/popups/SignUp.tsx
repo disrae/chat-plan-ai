@@ -40,7 +40,7 @@ export function SignUp({
     const handleSignUp = async () => {
         setLoading('signUp');
         try {
-            const result = await signIn("password", { email, password, flow, name, accountType, conversationIds: [], businessName });
+            const result = await signIn("password", { email, password, flow, name, accountType, conversationIds: [], businessName, pushToken: [] });
             setEmailSent(true);
         } catch (error) {
             handleError(error);

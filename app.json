@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "chat-plan-ai",
-    "slug": "chat-plan-ai",
+    "slug": "chatplanai",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -34,6 +34,12 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "49259892-9821-4d32-987e-40c26075d268"
+      }
+    },
+    "owner": "disrae"
   }
 }

@@ -1,5 +1,6 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { mutation, query } from "./_generated/server";
+import { action, internalAction, mutation, query } from "./_generated/server";
+import { internal } from "./_generated/api";
 import { v } from "convex/values";
 
 export const list = query({
@@ -9,11 +10,9 @@ export const list = query({
         if (!userId) { return null; }
         const user = await ctx.db.get(userId);
         if (!user) { return null; }
-        // Get the conversation.
         const conversation = await ctx.db.get(conversationId);
         if (!conversation) { return null; }
 
-        // Check if the user is a participant in the conversation.
         if (!conversation.participants.includes(userId)) {
             console.error(
                 "User is not a participant in the conversation.",
@@ -51,48 +50,86 @@ export const send = mutation({
             return null;
         }
 
-        return await ctx.db.insert("messages", {
+        const participantUsers = await Promise.all(
+            conversation.participants.map(participantId => ctx.db.get(participantId))
+        );
+        console.log({ participantUsers });
+        const pushTokens = participantUsers
+            .filter(user => user?._id !== userId) // Exclude the author
+            .flatMap(user => user?.pushTokens || []);
+        const uniquePushTokens = [...new Set(pushTokens)].filter(Boolean);
+        console.log("Push tokens for conversation participants (excluding author):", uniquePushTokens);
+
+        const messageId = await ctx.db.insert("messages", {
             author: userId,
             name,
             body,
             conversationId,
         });
+
+        for (const token of uniquePushTokens) {
+            await ctx.scheduler.runAfter(0, internal.messages.sendPushNotification, {
+                token,
+                title: name,
+                message: body,
+                conversationId,
+                businessName: conversation.businessName,
+                projectName: conversation.projectName,
+            });
+        }
+
+        return messageId;
     },
 });
 
-// export const addMessage = mutation({
-//     args: {
-//         author: v.string(),
-//         role: v.union(v.literal("user"), v.literal('owner')),
-//         body: v.string(),
-//         conversationId: v.id("conversations"),
-//     },
-//     handler: async (ctx, { author, role, body, conversationId }) => {
-//         await ctx.db.insert("messages", {
-//             author,
-//             role,
-//             body,
-//             conversationId,
-//         });
-//     },
-// });
+export const sendPushNotification = internalAction({
+    args: {
+        token: v.string(),
+        title: v.string(),
+        message: v.string(),
+        conversationId: v.id("conversations"),
+        businessName: v.optional(v.string()),
+        projectName: v.optional(v.string()),
+    },
+    handler: async (ctx, { message, token, title, conversationId, businessName, projectName }) => {
+        try {
+            const response = await fetch('https://exp.host/--/api/v2/push/send', {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Accept-encoding': 'gzip, deflate',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    to: token,
+                    title,
+                    body: message,
+                    data: { conversationId, businessName, projectName },
+                }),
+            });
+
+            if (!response.ok) {
+                console.error(`Failed to send notification: ${await response.text()}`);
+            }
+        } catch (error) {
+            console.error(`Error sending notification:`, error);
+        }
+    },
+});
 
 export const deleteMessage = mutation({
     args: { messageId: v.id("messages") },
     handler: async (ctx, { messageId }) => {
-        // Delete the message from the messages table
         await ctx.db.delete(messageId);
     },
 });
 
-// Mutation to update a message's body
 export const updateMessage = mutation({
     args: {
         messageId: v.id("messages"),
         newBody: v.string(),
     },
     handler: async (ctx, { messageId, newBody }) => {
-        // Update the message body
         await ctx.db.patch(messageId, { body: newBody });
     },
 });
@@ -104,7 +141,6 @@ export const getConversationMessages = query({
             .query("messages")
             .withIndex("by_conversationId", (q) => q.eq("conversationId", conversationId))
             .collect();
-        console.log({ messages });
         return messages;
     },
 });

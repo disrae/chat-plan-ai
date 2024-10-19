@@ -1,23 +1,26 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, SafeAreaView, Pressable } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, SafeAreaView, Pressable, Platform } from 'react-native';
 import { AntDesign, FontAwesome } from '@expo/vector-icons'; // For icons, you can replace these if needed
 
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { colors } from '@/constants/Colors';
 import { shadow } from '@/constants/styles';
-import { useQuery } from 'convex/react';
+import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { useAuthActions } from '@convex-dev/auth/dist/react';
 import { AddProject } from '@/components/popups/AddProject';
 import { Id } from '@/convex/_generated/dataModel';
 import { AddConversation } from '@/components/popups/AddConversation';
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
 
 export type DashboardModals = {
     type: '' | 'addProject' | 'addConversation',
     payload?: { projectId?: Id<'projects'>; };
 };
 
-export default function CompanyDashboard() {
+export default function Conversations() {
     const router = useRouter();
     const { company } = useLocalSearchParams();
     const { signOut } = useAuthActions();
@@ -25,12 +28,80 @@ export default function CompanyDashboard() {
     const user = useQuery(api.users.currentUser);
     const business = dashboard?.businesses?.[0];
     const [modal, setModal] = useState<DashboardModals>({ type: '' });
+    const updateUser = useMutation(api.users.updateUser);
+    const notificationListener = useRef<Notifications.Subscription>();
+    const responseListener = useRef<Notifications.Subscription>();
 
     useEffect(() => {
         if (user === null) {
             router.replace('/');
+        } else if (user) {
+            registerForPushNotificationsAsync().then(token => updateUserPushToken(token));
         }
+
+        // Set up notification listeners
+        notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+            // console.log(notification);
+            // Handle the received notification here if needed
+        });
+
+        responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+            const conversationId = response.notification.request.content.data?.conversationId;
+            if (conversationId) {
+                router.push(`/conversations/${conversationId}`);
+            }
+        });
+
+        return () => {
+            Notifications.removeNotificationSubscription(notificationListener.current!);
+            Notifications.removeNotificationSubscription(responseListener.current!);
+        };
     }, [user]);
+
+    const updateUserPushToken = async (token: string | undefined) => {
+        if (token) {
+            try {
+                await updateUser({ pushToken: token });
+            } catch (error) {
+                console.error('Failed to update user push token:', error);
+            }
+        }
+    };
+
+    async function registerForPushNotificationsAsync() {
+        let token;
+        if (Device.isDevice) {
+            const { status: existingStatus } = await Notifications.getPermissionsAsync();
+            let finalStatus = existingStatus;
+            if (existingStatus !== 'granted') {
+                const { status } = await Notifications.requestPermissionsAsync();
+                finalStatus = status;
+            }
+            if (finalStatus !== 'granted') {
+                alert('Failed to get push token for push notification!');
+                return;
+            }
+            const projectId = Constants.expoConfig?.extra?.eas?.projectId;
+            if (!projectId) {
+                alert('Project ID not found');
+                return;
+            }
+            token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
+        } else {
+            alert('Must use physical device for Push Notifications');
+        }
+
+        if (Platform.OS === 'android') {
+            Notifications.setNotificationChannelAsync('default', {
+                name: 'default',
+                importance: Notifications.AndroidImportance.MAX,
+                vibrationPattern: [0, 250, 250, 250],
+                lightColor: '#FF231F7C',
+            });
+        }
+
+        return token;
+    }
 
     return (
         <View className="flex-1">
@@ -90,4 +161,3 @@ export default function CompanyDashboard() {
         </View >
     );
 };
-

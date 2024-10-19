@@ -77,38 +77,30 @@ export const getUserDashboardData = query({
 });
 
 export const updateUser = mutation({
-    args: { name: v.string(), email: v.string(), businessName: v.optional(v.string()) },
+    args: {
+        name: v.optional(v.string()),
+        email: v.optional(v.string()),
+        businessName: v.optional(v.string()),
+        pushToken: v.optional(v.string())
+    },
     handler: async (ctx, args) => {
         const userId = await getAuthUserId(ctx);
-        if (!userId) {
-            throw new Error("User not authenticated");
-        }
+        if (!userId) { throw new Error("User not authenticated"); }
 
         const user = await ctx.db.get(userId);
-        if (!user) {
-            throw new Error("User not found");
-        }
-
-        if (!args.name.trim() || !args.email.trim()) {
-            throw new Error("Name and email are required");
-        }
+        if (!user) { throw new Error("User not found"); }
 
         try {
-            if (user.accountType === "personal") {
-                await ctx.db.patch(userId, {
-                    name: args.name,
-                    email: args.email
-                });
+            const updateFields: Partial<typeof user> = {};
+            if (args.name !== undefined) updateFields.name = args.name;
+            if (args.email !== undefined) updateFields.email = args.email;
+            if (args.businessName !== undefined) updateFields.businessName = args.businessName;
 
-                return { success: true };
+            if (args.pushToken !== undefined) {
+                updateFields.pushTokens = [...new Set([...(user.pushTokens || []), args.pushToken])];
             }
 
-            if (user.accountType === "business") {
-                if (!args.businessName || !args.businessName.trim()) {
-                    throw new Error("Business name is required for business accounts");
-                }
-
-                // Check if the business name is already taken
+            if (user.accountType === "business" && args.businessName) {
                 const existingBusiness = await ctx.db
                     .query("businesses")
                     .filter(q => q.eq(q.field("name"), args.businessName))
@@ -125,7 +117,7 @@ export const updateUser = mutation({
 
                 for (const conversation of userConversations) {
                     await ctx.db.patch(conversation._id, {
-                        ownerName: args.name,
+                        ownerName: args.name || user.name,
                         businessName: args.businessName
                     });
                 }
@@ -135,13 +127,9 @@ export const updateUser = mutation({
                         await ctx.db.patch(businessId, { name: args.businessName });
                     }
                 }
-
-                await ctx.db.patch(userId, {
-                    name: args.name,
-                    email: args.email,
-                    businessName: args.businessName
-                });
             }
+
+            await ctx.db.patch(userId, updateFields);
 
             return { success: true };
         } catch (error) {

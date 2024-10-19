@@ -12,12 +12,10 @@ export const { auth, signIn, signOut, store } = convexAuth({
         return args.existingUserId;
       }
 
-      // Implement your own account linking logic:
       const user = await ctx.db.query("users").filter(q => q.eq(q.field("email"), args.profile.email)).first();
       console.log(JSON.stringify({ user }, null, 2));
       if (user) return user._id;
 
-      // Implement your own user creation:
       const userId = await ctx.db.insert("users", {
         email: args.profile.email as string,
         name: args.profile.name as string,
@@ -25,6 +23,7 @@ export const { auth, signIn, signOut, store } = convexAuth({
         businesses: args.profile.accountType === 'business' ? [] : null,
         businessName: args.profile.accountType === 'business' ? args.profile.businessName as string : null,
         conversationIds: [],
+        pushTokens: []
       });
 
       if (args.profile.accountType === 'business') {
