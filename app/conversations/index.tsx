@@ -4,7 +4,6 @@ import { AntDesign, FontAwesome } from '@expo/vector-icons'; // For icons, you c
 
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { colors } from '@/constants/Colors';
-import { shadow } from '@/constants/styles';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { useAuthActions } from '@convex-dev/auth/dist/react';
@@ -39,10 +38,8 @@ export default function Conversations() {
             registerForPushNotificationsAsync().then(token => updateUserPushToken(token));
         }
 
-        // Set up notification listeners
         notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
             // console.log(notification);
-            // Handle the received notification here if needed
         });
 
         responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
