@@ -11,7 +11,6 @@ import { View, Text, TextInput, SafeAreaView, ScrollView, Pressable, ActivityInd
 export default function AccountSettings() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
-    const [businessName, setBusinessName] = useState('');
     const user = useQuery(api.users.currentUser);
     const [tab, setTab] = useState<'profile' | 'notifications'>('profile');
     const [isUpdating, setIsUpdating] = useState(false);
@@ -22,15 +21,13 @@ export default function AccountSettings() {
     const handleBack = () => {
         if (!user) return;
         if (router.canGoBack()) return router.back();
-        if (user.accountType === 'personal') return router.replace('/conversations');
-        if (user.accountType === 'business') return router.replace(`/${user.businessName}`);
+        router.replace('/conversations');
     };
 
     useEffect(() => {
         if (user === null) router.replace('/');
         if (!user) return;
         setEmail(user.email || '');
-        setBusinessName(user.businessName || '');
         setName(user.name || '');
     }, [user]);
 
@@ -51,12 +48,9 @@ export default function AccountSettings() {
         if (!user) return;
         setIsUpdating(true);
         try {
-            const result = await updateUser({ name, businessName });
+            const result = await updateUser({ name });
             if (result.success) {
                 setSuccessMessage('Profile updated successfully!');
-                if (user.businessName !== businessName) {
-                    router.replace(`/${businessName}/settings`);
-                }
             }
         } catch (error: any) {
             console.log(error);
@@ -118,19 +112,13 @@ export default function AccountSettings() {
                             onChangeText={setName}
                             placeholder="Name"
                         />
-                        <Text>Company</Text>
-                        <TextInput
-                            className="h-10 border border-gray-300 rounded-md px-2 mb-4 bg-white"
-                            value={businessName}
-                            onChangeText={setBusinessName}
-                            placeholder="Company"
-                        />
                         <Text>Email</Text>
                         <TextInput
                             className="h-10 border border-gray-300 rounded-md px-2 mb-4 bg-gray-100"
                             value={email}
                             editable={false}
                             placeholder="Email"
+                            pointerEvents="none"
                         />
                     </View>}
                 {/* Notifications */}

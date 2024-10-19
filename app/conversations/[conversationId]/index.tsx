@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, FlatList, KeyboardAvoidingView, Platform, SafeAreaView, Pressable, ActivityIndicator, StatusBar } from 'react-native';
+import { View, Text, TextInput, FlatList, KeyboardAvoidingView, Platform, SafeAreaView, Pressable, ActivityIndicator, StatusBar, Keyboard } from 'react-native';
 import { useQuery, useMutation } from "convex/react";
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -63,6 +63,10 @@ export default function Chat() {
         } catch (error) {
             console.error("Failed to copy URL: ", error);
         }
+    };
+
+    const handleScroll = () => {
+        Keyboard.dismiss();
     };
 
     if (!conversation) { return null; }
@@ -132,6 +136,8 @@ export default function Chat() {
                     }}
                     keyExtractor={(item) => item._id}
                     onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+                    onScroll={handleScroll}
+                    scrollEventThrottle={16}
                 />
 
                 {/* Input */}

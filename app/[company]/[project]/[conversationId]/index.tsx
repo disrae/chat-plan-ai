@@ -9,7 +9,6 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import * as Clipboard from 'expo-clipboard';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import { ShareInfo } from '@/components/popups/ShareInfo';
-import { colors } from '@/constants/Colors';
 
 export type ConversationModals = {
     type: '' | 'share-info';

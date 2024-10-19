@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TextInput, FlatList, SafeAreaView, Pressable, Platform, Button, AppState } from 'react-native';
+import { View, Text, TextInput, FlatList, SafeAreaView, Pressable, Platform, Button, AppState, StatusBar } from 'react-native';
 import { AntDesign, FontAwesome, SimpleLineIcons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { colors } from '@/constants/Colors';
@@ -34,7 +34,6 @@ async function sendPushNotification(expoPushToken: string) {
         body: JSON.stringify(message),
     });
 }
-
 function handleRegistrationError(errorMessage: string) {
     alert(errorMessage);
     throw new Error(errorMessage);
@@ -44,7 +43,6 @@ export type DashboardModals = {
     type: '' | 'addProject' | 'addConversation',
     payload?: { projectId?: Id<'projects'>; };
 };
-
 export default function CompanyDashboard() {
     const router = useRouter();
     const { company } = useLocalSearchParams();
@@ -64,7 +62,7 @@ export default function CompanyDashboard() {
     const notificationListener = useRef<Notifications.Subscription>();
     const responseListener = useRef<Notifications.Subscription>();
     const updateUser = useMutation(api.users.updateUser);
-
+    const fuse = new Fuse(business?.projects || [], { keys: ['name'], threshold: 0.3 });
     async function registerForPushNotificationsAsync() {
         if (Platform.OS === 'android') {
             Notifications.setNotificationChannelAsync('default', {
@@ -103,7 +101,6 @@ export default function CompanyDashboard() {
             handleRegistrationError('Must use physical device for push notifications');
         }
     }
-
     useEffect(() => {
         registerForPushNotificationsAsync()
             .then(token => {
@@ -141,13 +138,10 @@ export default function CompanyDashboard() {
                 Notifications.removeNotificationSubscription(responseListener.current);
         };
     }, [user]);
-
     useEffect(() => {
         if (dashboard?.user.accountType === 'personal') { router.replace('/conversations'); }
         if (user === null) { router.replace('/'); }
     }, [dashboard?.user, user]);
-
-    const fuse = new Fuse(business?.projects || [], { keys: ['name'], threshold: 0.3 });
 
     useEffect(() => {
         if (searchQuery.trim()) {
@@ -158,6 +152,21 @@ export default function CompanyDashboard() {
         }
     }, [searchQuery, business?.projects]);
 
+    useEffect(() => {
+        const subscription = Notifications.addNotificationResponseReceivedListener(response => {
+            const data = response.notification.request.content.data;
+            if (data.conversationId) {
+                if (user?.accountType === 'business' && data.businessName && data.projectName) {
+                    router.push(`/${data.businessName}/${data.projectName}/${data.conversationId}`);
+                } else {
+                    router.push(`/conversations/${data.conversationId}`);
+                }
+            }
+        });
+
+        return () => subscription.remove();
+    }, [user]);
+
     const toggleProject = (projectId: Id<'projects'>) => {
         setExpandedProjects(prev =>
             prev.includes(projectId)
@@ -165,7 +174,6 @@ export default function CompanyDashboard() {
                 : [...prev, projectId]
         );
     };
-
     const renderProject = ({ item: project }) => {
         if (!project) return null;
 
@@ -219,36 +227,25 @@ export default function CompanyDashboard() {
         );
     };
 
-    useEffect(() => {
-        const subscription = Notifications.addNotificationResponseReceivedListener(response => {
-            const data = response.notification.request.content.data;
-            if (data.conversationId) {
-                if (user?.accountType === 'business' && data.businessName && data.projectName) {
-                    router.push(`/${data.businessName}/${data.projectName}/${data.conversationId}`);
-                } else {
-                    router.push(`/conversations/${data.conversationId}`);
-                }
-            }
-        });
-
-        return () => subscription.remove();
-    }, [user]);
-
     return (
-        <View className="flex-1 bg-gray-50">
+        <View className="flex-1 bg-primary-dark">
+            <StatusBar barStyle="light-content" />
             {modal.type === 'addProject' && <AddProject setModal={setModal} />}
             {modal.type === 'addConversation' && <AddConversation setModal={setModal} projectId={modal.payload?.projectId} />}
-            <SafeAreaView className="flex-1 mx-4 md:my-4 items-center gap-y-4">
-                <View className='flex-1 w-full max-w-2xl pt-4'>
-                    {/* Settings Button */}
-                    <View className='flex-row justify-end'>
-                        <Pressable
-                            onPress={() => setPopup({ type: popup.type === 'settings' ? '' : 'settings' })}
-                            style={[popup.type === 'settings' ? {} : shadow]}
-                            className={`${popup.type === 'settings' ? 'bg-slate-200' : 'bg-slate-100'} shadow px-2 py-2 rounded-full`}
-                        >
-                            <AntDesign name="setting" size={24} color="black" />
-                        </Pressable>
+            <SafeAreaView className="flex-1" >
+                <View className="flex-1 bg-white">
+                    <View className="px-4 py-4 bg-primary-dark">
+                        <View className='flex-row justify-between items-center mb-4 gap-4'>
+                            <Text className="text-3xl font-bold text-white flex-shrink">{company}</Text>
+                            <Pressable
+                                onPress={() => setPopup({ type: popup.type === 'settings' ? '' : 'settings' })}
+                                style={[popup.type === 'settings' ? {} : shadow]}
+                                className={`${popup.type === 'settings' ? 'bg-slate-200' : 'bg-slate-100'} shadow px-2 py-2 rounded-full flex-shrink-0`}
+                            >
+                                <AntDesign name="setting" size={24} color="black" />
+                            </Pressable>
+                        </View>
+                        <Text className="text-xl font-semibold text-white mt-2">Projects & Conversations</Text>
                     </View>
                     {popup.type === 'settings' &&
                         <>
@@ -258,75 +255,59 @@ export default function CompanyDashboard() {
                                 onPress={() => setPopup({ type: '' })}
                             />
                             <View className='absolute right-8 top-10 bg-gray-50 rounded shadow z-20'>
-                                <View className='p-2 border-b border-gray-400 rounded-t'>
-                                    <Text className="font-bold">My Account</Text>
+                                <View className='p-3 border-b border-gray-400 rounded-t'>
+                                    <Text className="font-bold text-lg">My Account</Text>
                                 </View>
                                 <Pressable
                                     onPress={() => router.push(`/${company}/settings`)}
-                                    className='flex-row items-center hover:bg-gray-100 p-2 border-b border-gray-300'
+                                    className='flex-row items-center hover:bg-gray-100 p-3 border-b border-gray-300'
                                 >
-                                    <AntDesign name="setting" size={12} color="black" />
-                                    <Text className="pl-2">Settings</Text>
+                                    <AntDesign name="setting" size={18} color="black" />
+                                    <Text className="pl-3 text-base">Settings</Text>
                                 </Pressable>
-                                <Pressable onPress={signOut} className='flex-row items-center hover:bg-gray-100 p-2 '>
-                                    <SimpleLineIcons name="logout" size={12} color="black" />
-                                    <Text className="pl-2">Log out</Text>
+                                <Pressable onPress={signOut} className='flex-row items-center hover:bg-gray-100 p-3'>
+                                    <SimpleLineIcons name="logout" size={18} color="black" />
+                                    <Text className="pl-3 text-base">Log out</Text>
                                 </Pressable>
                             </View>
                         </>
                     }
 
-                    {/* Company Info */}
-                    <View className="mb-4">
-                        <Text className="text-3xl font-bold mt-2">{company}</Text>
-                        <Text className="text-xl font-semibold">Projects & Conversations</Text>
+                    <View className="flex-1 mx-4 md:my-4 items-center gap-y-4">
+                        <View className='flex-1 w-full max-w-2xl pt-4'>
+                            {/* New Project Button */}
+                            <Pressable
+                                onPress={() => setModal({ type: 'addProject' })}
+                                className="flex-row bg-primary py-2 px-2 rounded-lg items-center mb-6"
+                            >
+                                <Text className='text-white pr-1 -mt-[2px] text-xl font-medium '>+</Text>
+                                <Text className="text-white font-medium ">New Project</Text>
+                            </Pressable>
+
+                            {/* Search Input */}
+                            {!!business?.projects.length && (
+                                <TextInput
+                                    className="bg-white p-2 mb-4 border rounded-lg"
+                                    placeholder="Search projects..."
+                                    value={searchQuery}
+                                    onChangeText={setSearchQuery}
+                                    inputMode='text'
+                                />
+                            )}
+
+                            {/* Project List */}
+                            <FlatList
+                                data={filteredProjects}
+                                className='mb-10 '
+                                showsVerticalScrollIndicator={false}
+                                keyExtractor={item => item?._id || ''}
+                                renderItem={renderProject}
+                                contentContainerStyle={{ paddingBottom: 10 }}
+                            />
+                        </View>
                     </View>
-
-                    {/* New Project Button */}
-                    <Pressable
-                        onPress={() => setModal({ type: 'addProject' })}
-                        className="flex-row bg-primary py-2 px-2 rounded-lg items-center mb-6"
-                    >
-                        <Text className='text-white pr-1 -mt-[2px] text-xl font-medium '>+</Text>
-                        <Text className="text-white font-medium ">New Project</Text>
-                    </Pressable>
-
-                    {/* Search Input */}
-                    {!!business?.projects.length && (
-                        <TextInput
-                            className="bg-white p-2 mb-4 border rounded-lg"
-                            placeholder="Search projects..."
-                            value={searchQuery}
-                            onChangeText={setSearchQuery}
-                            inputMode='text'
-                        />
-                    )}
-
-                    {/* Push Notifications Test */}
-                    <Text>Your Expo push token: {expoPushToken}</Text>
-                    <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                        <Text>Title: {notification && notification.request.content.title} </Text>
-                        <Text>Body: {notification && notification.request.content.body}</Text>
-                        <Text>Data: {notification && JSON.stringify(notification.request.content.data)}</Text>
-                    </View>
-                    <Button
-                        title="Press to Send Notification"
-                        onPress={async () => {
-                            await sendPushNotification(expoPushToken);
-                        }}
-                    />
-
-                    {/* Project List */}
-                    <FlatList
-                        data={filteredProjects}
-                        className='mb-10 '
-                        showsVerticalScrollIndicator={false}
-                        keyExtractor={item => item?._id || ''}
-                        renderItem={renderProject}
-                        contentContainerStyle={{ paddingBottom: 10 }}
-                    />
                 </View>
-            </SafeAreaView >
-        </View >
+            </SafeAreaView>
+        </View>
     );
 }
