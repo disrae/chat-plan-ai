@@ -56,8 +56,10 @@ export default function Conversations() {
         }
 
         return () => {
-            Notifications.removeNotificationSubscription(notificationListener.current!);
-            Notifications.removeNotificationSubscription(responseListener.current!);
+            if (Platform.OS !== 'web') {
+                Notifications.removeNotificationSubscription(notificationListener.current!);
+                Notifications.removeNotificationSubscription(responseListener.current!);
+            }
         };
     }, [user]);
 
