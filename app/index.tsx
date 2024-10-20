@@ -8,14 +8,14 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAuthActions } from "@convex-dev/auth/dist/react";
 import { useRouter } from "expo-router";
-
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 export type HomeScreenModals = '' | 'signUp' | 'signIn';
 export default function HomePage() {
     const router = useRouter();
     const user = useQuery(api.users.currentUser);
     const { signOut } = useAuthActions();
     const [modal, setModal] = useState<HomeScreenModals>('');
-
+    const insets = useSafeAreaInsets();
     console.log(JSON.stringify({ user }, null, 2));
 
     useEffect(() => {
@@ -29,34 +29,23 @@ export default function HomePage() {
         <View className="flex-1">
             {modal &&
                 <SignUp setModal={setModal} initialFlow={modal} />}
-            <SafeAreaView className="flex-1 mx-4 py-4">
+            <View className="bg-primary-dark" style={{ height: insets.top }} />
+            <SafeAreaView className="flex-1 bg-gray-100">
                 <View className="flex-1 flex-col min-h-[100vh]">
                     {/* Header */}
-                    <View className="flex-row items-center justify-between py-2 px-4 lg:px-6">
-                        <Pressable className="flex items-center justify-center">
-                            <AntDesign name="message1" size={24} color={colors.primary.DEFAULT} />
-                            <Text className="sr-only">Chat App</Text>
-                        </Pressable>
-
-                        {/* Navigation links aligned to the right with responsive spacing */}
+                    <View className="flex-row items-center justify-around py-2 px-8 -mx-4 bg-primary-dark lg:px-16">
+                        <View className="w-2 h-2" />
+                        <Text className="text-3xl text-gray-100 font-bold tracking-tighter sm:text-4xl md:text-5xl ">Chat Plan</Text>
                         <View className="flex-row ml-auto space-x-2 sm:space-x-4 lg:space-x-10">
-                            {user
-                                ? <Pressable
-                                    onPress={() => { signOut(); }}
-                                    className="bg-slate-200 shadow px-4 py-2 rounded">
-                                    <Text className="font-medium">Logout</Text>
-                                </Pressable>
-                                : <Pressable
-                                    onPress={() => { setModal('signIn'); }}
-                                    className="bg-slate-200 shadow px-4 py-2 rounded">
-                                    <Text className="font-medium">Sign In</Text>
-                                </Pressable>}
+                            <Pressable
+                                onPress={() => { setModal('signIn'); }}
+                                className="bg-slate-200 shadow px-4 py-2 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+                                <Text className="font-semibold">Sign In</Text>
+                            </Pressable>
                         </View>
                     </View>
 
-                    {/* Main Content */}
-                    <ScrollView>
-                        {/* Titles */}
+                    <ScrollView className="px-4" showsVerticalScrollIndicator={false} >
                         <View className="w-full items-center px-4 md:px-6">
                             <View className="h-12"></View>
                             <Text className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl xl:text-[3.4rem] 2xl:text-[3.75rem] text-center">
@@ -70,7 +59,7 @@ export default function HomePage() {
                             <View className="h-12"></View>
                             <View className="justify-center items-center">
                                 <Pressable className="bg-primary px-6 py-2 rounded-md" onPress={() => setModal('signUp')}>
-                                    <Text className="text-white text-xl font-semibold">Sign Up</Text>
+                                    <Text className="text-gray-100 text-xl font-semibold">Sign Up</Text>
                                 </Pressable>
                             </View>
                         </View>

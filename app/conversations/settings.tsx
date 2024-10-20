@@ -62,22 +62,20 @@ export default function AccountSettings() {
     };
 
     return (
-        <View className='flex-1 bg-primary-dark'>
+        <View className='flex-1'>
             <StatusBar barStyle="light-content" />
-            <View className='bg-primary-dark'>
-                <SafeAreaView className='bg-primary-dark'>
-                    {/* Header */}
-                    <View className='flex-row justify-between items-center'>
-                        <Pressable onPress={handleBack}
-                            className='left-4 p-2'
-                            hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}>
-                            <AntDesign name="arrowleft" size={36} color="white" />
-                        </Pressable>
-                        <Text className="text-2xl font-medium text-white text-center flex-1">Account Settings</Text>
-                        <View className='right-4 w-8' />
-                    </View>
-                </SafeAreaView>
-            </View>
+            <SafeAreaView className='bg-primary-dark'>
+                {/* Header */}
+                <View className='flex-row justify-between items-center'>
+                    <Pressable onPress={handleBack}
+                        className='left-4 p-2'
+                        hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}>
+                        <AntDesign name="arrowleft" size={36} color="white" />
+                    </Pressable>
+                    <Text className="text-2xl font-medium text-white text-center flex-1">Account Settings</Text>
+                    <View className='right-4 w-8' />
+                </View>
+            </SafeAreaView>
             <SafeAreaView className='flex-1 items-center bg-gray-50'>
                 <ScrollView className='w-full max-w-2xl px-'>
                     {/* Tabs */}

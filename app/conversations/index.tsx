@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, SafeAreaView, Pressable, Platform, StatusBar } from 'react-native';
 import { AntDesign, FontAwesome, SimpleLineIcons } from '@expo/vector-icons'; // For icons, you can replace these if needed
 import { shadow } from '@/constants/styles';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { colors } from '@/constants/Colors';
@@ -34,6 +35,7 @@ export default function Conversations() {
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredConversations, setFilteredConversations] = useState(dashboard?.conversations || []);
     const [popup, setPopup] = useState<{ type: 'settings' | ''; }>({ type: '' });
+    const insets = useSafeAreaInsets();
 
     useEffect(() => {
         if (user === null) {
@@ -121,10 +123,9 @@ export default function Conversations() {
     }
 
     return (
-        <View className="flex-1 bg-primary-dark">
-            <StatusBar barStyle="light-content" />
-            {modal.type === 'addProject' && <AddProject setModal={setModal} />}
-            {modal.type === 'addConversation' && <AddConversation setModal={setModal} projectId={modal.payload?.projectId} />}
+        <View className="flex-1">
+            <StatusBar barStyle="light-content" backgroundColor={colors.primary.dark} />
+            <View className="bg-primary-dark" style={{ height: insets.top }} />
             <SafeAreaView className="flex-1">
                 <View className="flex-1 bg-white">
                     <View className="px-4 py-4 bg-primary-dark">

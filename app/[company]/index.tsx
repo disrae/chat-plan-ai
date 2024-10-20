@@ -14,6 +14,7 @@ import Fuse from 'fuse.js';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
+import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 async function sendPushNotification(expoPushToken: string) {
     const message = {
@@ -63,6 +64,8 @@ export default function CompanyDashboard() {
     const responseListener = useRef<Notifications.Subscription>();
     const updateUser = useMutation(api.users.updateUser);
     const fuse = new Fuse(business?.projects || [], { keys: ['name'], threshold: 0.3 });
+    const insets = useSafeAreaInsets();
+
     async function registerForPushNotificationsAsync() {
         if (Platform.OS === 'android') {
             Notifications.setNotificationChannelAsync('default', {
@@ -101,6 +104,7 @@ export default function CompanyDashboard() {
             handleRegistrationError('Must use physical device for push notifications');
         }
     }
+
     useEffect(() => {
         if (Platform.OS !== 'web') {
             registerForPushNotificationsAsync()
@@ -140,6 +144,7 @@ export default function CompanyDashboard() {
             };
         }
     }, [user]);
+
     useEffect(() => {
         if (dashboard?.user.accountType === 'personal') { router.replace('/conversations'); }
         if (user === null) { router.replace('/'); }
@@ -176,6 +181,7 @@ export default function CompanyDashboard() {
                 : [...prev, projectId]
         );
     };
+
     const renderProject = ({ item: project }) => {
         if (!project) return null;
 
@@ -230,8 +236,9 @@ export default function CompanyDashboard() {
     };
 
     return (
-        <View className="flex-1 bg-primary-dark">
-            <StatusBar barStyle="light-content" />
+        <View className="flex-1">
+            <StatusBar barStyle="light-content" backgroundColor={colors.primary.dark} />
+            <View className="bg-primary-dark" style={{ height: insets.top }} />
             {modal.type === 'addProject' && <AddProject setModal={setModal} />}
             {modal.type === 'addConversation' && <AddConversation setModal={setModal} projectId={modal.payload?.projectId} />}
             <SafeAreaView className="flex-1" >
