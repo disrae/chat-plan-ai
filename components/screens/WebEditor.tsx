@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import 'react-quill/dist/quill.snow.css';
 
 export function WebEditor() {
@@ -32,37 +32,26 @@ export function WebEditor() {
         'link', 'image',
     ];
 
-    const styles = StyleSheet.create({
-        container: {
-            flex: 1,
-        },
-        editor: {
-            flex: 1,
-            borderWidth: 1,
-            borderColor: 'red',
-        },
-        toolbar: {
-
-        },
-    });
-
     return (
-        <View style={styles.container}>
-            {isClient && (
-                (() => {
-                    const ReactQuill = require('react-quill');
-                    return (
-                        <ReactQuill
-                            ref={quillRef}
-                            theme="snow"
-                            value={content}
-                            onChange={handleContentChange}
-                            modules={modules}
-                            formats={formats}
-                        />
-                    );
-                })()
-            )}
-        </View>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+            <View className="flex-1">
+                {isClient && (
+                    (() => {
+                        const ReactQuill = require('react-quill');
+                        return (
+                            <ReactQuill
+                                ref={quillRef}
+                                theme="snow"
+                                value={content}
+                                onChange={handleContentChange}
+                                modules={modules}
+                                formats={formats}
+                                style={{ height: '100%' }}
+                            />
+                        );
+                    })()
+                )}
+            </View>
+        </ScrollView>
     );
 }
