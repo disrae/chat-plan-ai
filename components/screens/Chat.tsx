@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, Pressable, FlatList, KeyboardAvoidingView, Platform, StatusBar, SafeAreaView, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, Pressable, FlatList, KeyboardAvoidingView, Platform, StatusBar, SafeAreaView, ActivityIndicator, Keyboard } from 'react-native';
 import { useRouter } from 'expo-router';
 import { AntDesign, EvilIcons, FontAwesome } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
