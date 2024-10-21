@@ -38,10 +38,14 @@ export function MobileEditor() {
           padding: 0;
         }
         .ql-container {
-          font-size: 18px;
+          font-size: 16px;
         }
         .ql-editor {
           padding: 12px;
+        }
+        h1 {
+          font-size: 24px;
+          font-weight: bold;
         }
       </style>
     </head>
@@ -51,35 +55,10 @@ export function MobileEditor() {
         var quill = new Quill('#editor', {
           theme: 'snow',
           modules: {
-            toolbar: [
-              ['bold', 'italic', 'underline'],
-              [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-              ['image', 'link'],
-              ['clean']
-            ]
+            toolbar: true
           }
         });
         quill.root.innerHTML = ${JSON.stringify(html)};
-
-        // Handle image upload
-        quill.getModule('toolbar').addHandler('image', () => {
-          const input = document.createElement('input');
-          input.setAttribute('type', 'file');
-          input.setAttribute('accept', 'image/*');
-          input.click();
-
-          input.onchange = async () => {
-            const file = input.files[0];
-            const reader = new FileReader();
-
-            reader.onload = (e) => {
-              const range = quill.getSelection(true);
-              quill.insertEmbed(range.index, 'image', e.target.result);
-            };
-
-            reader.readAsDataURL(file);
-          };
-        });
       </script>
     </body>
     </html>
