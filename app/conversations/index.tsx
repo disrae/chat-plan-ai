@@ -174,37 +174,39 @@ export default function Conversations() {
                     }
                     <ScrollView className="flex-1 px-4">
                         {/* Search Input */}
-                        {(!dashboard?.conversations?.length &&
-                            <TextInput
-                                className="bg-white p-2 my-4 border rounded-lg"
-                                placeholder="Search conversations..."
-                                inputMode='search'
-                                value={searchQuery}
-                                onChangeText={setSearchQuery}
-                            />
-                        )}
+                        <TextInput
+                            className="bg-white p-2 my-4 border rounded-lg"
+                            placeholder="Search conversations..."
+                            inputMode='search'
+                            value={searchQuery}
+                            onChangeText={setSearchQuery}
+                        />
 
                         {/* Conversation List */}
                         <View className="space-y-4 pt-4">
-                            {filteredConversations.map((conversation) => {
-                                if (!conversation) { return null; }
-                                return (
-                                    <Pressable
-                                        key={conversation?._id}
-                                        className="flex-row items-center bg-slate-200 py-3 px-2 rounded-md shadow"
-                                        onPress={() => {
-                                            router.push(`/conversations/${conversation?._id}`);
-                                        }}
-                                    >
-                                        <AntDesign style={{ paddingRight: 8 }} name="message1" size={16} color={colors.primary.DEFAULT} />
-                                        <View>
-                                            <Text className="text-lg font-medium">{conversation?.projectName}</Text>
-                                            <Text className="font-medium">{conversation?.businessName}</Text>
-                                            <Text>{conversation?.ownerName}</Text>
-                                        </View>
-                                    </Pressable>
-                                );
-                            })}
+                            {filteredConversations.length > 0 ? (
+                                filteredConversations.map((conversation) => {
+                                    if (!conversation) { return null; }
+                                    return (
+                                        <Pressable
+                                            key={conversation?._id}
+                                            className="flex-row items-center bg-slate-200 py-3 px-2 rounded-md shadow"
+                                            onPress={() => {
+                                                router.push(`/conversations/${conversation?._id}`);
+                                            }}
+                                        >
+                                            <AntDesign style={{ paddingRight: 8 }} name="message1" size={16} color={colors.primary.DEFAULT} />
+                                            <View>
+                                                <Text className="text-lg font-medium">{conversation?.projectName}</Text>
+                                                <Text className="font-medium">{conversation?.businessName}</Text>
+                                                <Text>{conversation?.ownerName}</Text>
+                                            </View>
+                                        </Pressable>
+                                    );
+                                })
+                            ) : (
+                                <Text className="text-2xl text-slate-400 text-center">Oh no! Looks like you don't have any conversations!</Text>
+                            )}
                         </View>
                     </ScrollView>
                 </View>

@@ -33,9 +33,9 @@ export default function HomePage() {
             <SafeAreaView className="flex-1 bg-gray-100">
                 <View className="flex-1 flex-col min-h-[100vh]">
                     {/* Header */}
-                    <View className="flex-row items-center justify-around py-2 px-8 -mx-4 bg-primary-dark lg:px-16">
+                    <View className="flex-row items-center justify-around py-2 px-8 -mx-4 bg-primary-dark lg:px-16 lg:py-4">
                         <View className="w-2 h-2" />
-                        <Text className="text-3xl text-gray-100 font-bold tracking-tighter sm:text-4xl md:text-5xl ">Chat Plan</Text>
+                        <Text className="text-3xl text-gray-100 font-bold tracking-tighter sm:text-4xl md:text-5xl ">ChatPlan</Text>
                         <View className="flex-row ml-auto space-x-2 sm:space-x-4 lg:space-x-10">
                             <Pressable
                                 onPress={() => { setModal('signIn'); }}
