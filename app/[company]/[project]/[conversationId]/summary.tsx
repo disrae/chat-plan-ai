@@ -15,13 +15,12 @@ export default function Summary() {
         router.back();
     };
 
-    // Choose the appropriate Editor based on the platform
-    // const Editor = Platform.OS === 'web' ? WebEditor : MobileEditor;
-
     return (
-        <View className='flex-1 bg-primary-dark'>
+        <View className='flex-1'>
             <StatusBar barStyle="light-content" />
+            <View style={{ height: insets.top, backgroundColor: colors.primary.dark }} />
             <SafeAreaView className='flex-1'>
+
                 {/* Header */}
                 <View className='bg-primary-dark'>
                     <View className='flex-row justify-center items-center px-4'>
@@ -33,6 +32,7 @@ export default function Summary() {
                     </View>
                 </View>
 
+                {/* Editor */}
                 <MobileEditor />
 
             </SafeAreaView>
