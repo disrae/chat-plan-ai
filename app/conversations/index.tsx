@@ -108,8 +108,6 @@ export default function Conversations() {
                 return;
             }
             token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
-        } else {
-            alert('Must use physical device for Push Notifications');
         }
 
         if (Platform.OS === 'android') {

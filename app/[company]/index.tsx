@@ -36,8 +36,7 @@ async function sendPushNotification(expoPushToken: string) {
     });
 }
 function handleRegistrationError(errorMessage: string) {
-    alert(errorMessage);
-    throw new Error(errorMessage);
+    return;
 }
 
 export type DashboardModals = {
@@ -101,7 +100,7 @@ export default function CompanyDashboard() {
                 handleRegistrationError(`${e}`);
             }
         } else {
-            handleRegistrationError('Must use physical device for push notifications');
+            return;
         }
     }
 
