@@ -139,4 +139,59 @@ export const updateUser = mutation({
     },
 });
 
+export const getBusinessByName = query({
+    args: { name: v.string() },
+    handler: async (ctx, { name }) => {
+        const user = await ctx.auth.getUserIdentity();
+        if (!user) {
+            throw new Error("Not authenticated");
+        }
 
+        const business = await ctx.db
+            .query("businesses")
+            .withIndex("by_name", (q) => q.eq("name", name))
+            .unique();
+
+        if (!business) {
+            throw new Error("Business not found");
+        }
+
+        if (business.ownerId !== user.subject) {
+            throw new Error("Not authorized to access this business");
+        }
+
+        return business;
+    },
+});
+
+export const getProjectByName = query({
+    args: {
+        businessId: v.optional(v.id("businesses")),
+        name: v.string()
+    },
+    handler: async (ctx, { businessId, name }) => {
+        if (!businessId) { throw new Error("Business ID is required"); }
+
+        const user = await ctx.auth.getUserIdentity();
+        if (!user) {
+            throw new Error("Not authenticated");
+        }
+
+        const business = await ctx.db.get(businessId);
+        if (!business || business.ownerId !== user.subject) {
+            throw new Error("Not authorized to access this business");
+        }
+
+        const project = await ctx.db
+            .query("projects")
+            .withIndex("by_businessId", (q) => q.eq("businessId", businessId))
+            .filter((q) => q.eq(q.field("name"), name))
+            .unique();
+
+        if (!project) {
+            throw new Error("Project not found");
+        }
+
+        return project;
+    },
+});

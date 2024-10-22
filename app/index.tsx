@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import '../constants/styles.css';
 import { View, Text, ScrollView, Pressable, Image, SafeAreaView } from "react-native";
-import AntDesign from '@expo/vector-icons/AntDesign';
 import { SignUp } from "@/components/popups/SignUp";
-import { colors } from "@/constants/Colors";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAuthActions } from "@convex-dev/auth/dist/react";
@@ -16,7 +14,6 @@ export default function HomePage() {
     const { signOut } = useAuthActions();
     const [modal, setModal] = useState<HomeScreenModals>('');
     const insets = useSafeAreaInsets();
-    console.log(JSON.stringify({ user }, null, 2));
 
     useEffect(() => {
         if (!user) { return; }
@@ -35,7 +32,10 @@ export default function HomePage() {
                     {/* Header */}
                     <View className="flex-row items-center justify-around py-2 px-8 -mx-4 bg-primary-dark lg:px-16 lg:py-4">
                         <View className="w-2 h-2" />
-                        <Text className="text-3xl text-gray-100 font-bold tracking-tighter sm:text-4xl md:text-5xl ">ChatPlan</Text>
+                        <View className="flex-row items-baseline">
+                            <Text className="text-3xl text-gray-100 font-bold tracking-tighter sm:text-4xl md:text-5xl">ChatPlan</Text>
+                            {/* <Text className="text-xs text-gray-300 ml-1">openbeta</Text> */}
+                        </View>
                         <View className="flex-row ml-auto space-x-2 sm:space-x-4 lg:space-x-10">
                             <Pressable
                                 onPress={() => { setModal('signIn'); }}

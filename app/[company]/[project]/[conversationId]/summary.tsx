@@ -1,11 +1,9 @@
 import React from 'react';
 import { colors } from '@/constants/Colors';
-import { View, Text, StatusBar, SafeAreaView, Pressable, Platform } from 'react-native';
+import { View, Text, StatusBar, SafeAreaView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { AntDesign } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { WebEditor } from '@/components/screens/WebEditor';
-import { MobileEditor } from '@/components/screens/MobileEditor';
+import { MobileEditor } from '@/components/screens/Editors/MobileEditor';
 
 export default function Summary() {
     const insets = useSafeAreaInsets();
