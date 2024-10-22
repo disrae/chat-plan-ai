@@ -2,12 +2,16 @@ import React from 'react';
 import { colors } from '@/constants/Colors';
 import { View, Text, StatusBar, SafeAreaView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams, useSegments } from 'expo-router';
 import { MobileEditor } from '@/components/screens/Editors/MobileEditor';
+import { Id } from '@/convex/_generated/dataModel';
 
 export default function Summary() {
     const insets = useSafeAreaInsets();
     const router = useRouter();
+    const params = useLocalSearchParams();
+
+    const conversationId = params.conversationId as Id<'conversations'>;
 
     const onBackPress = () => {
         router.back();
@@ -31,7 +35,7 @@ export default function Summary() {
                 </View>
 
                 {/* Editor */}
-                <MobileEditor />
+                <MobileEditor conversationId={conversationId} />
 
             </SafeAreaView>
         </View>

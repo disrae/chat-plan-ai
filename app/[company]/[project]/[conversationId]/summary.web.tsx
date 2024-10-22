@@ -2,12 +2,14 @@ import React from 'react';
 import { colors } from '@/constants/Colors';
 import { View, Text, StatusBar, SafeAreaView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { WebEditor } from '@/components/screens/Editors/WebEditor';
+import { Id } from '@/convex/_generated/dataModel';
 
 export default function Summary() {
     const insets = useSafeAreaInsets();
     const router = useRouter();
+    const { conversationId } = useLocalSearchParams();
 
     return (
         <View className='flex-1'>
@@ -27,7 +29,7 @@ export default function Summary() {
                 </View>
 
                 {/* Editor */}
-                <WebEditor />
+                <WebEditor conversationId={conversationId as Id<'conversations'>} />
 
             </SafeAreaView>
         </View>

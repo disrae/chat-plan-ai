@@ -1,8 +1,10 @@
 import { colors } from '@/constants/Colors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Tabs } from 'expo-router';
+import { Tabs, useLocalSearchParams } from 'expo-router';
 
 export default function TabLayout() {
+    const { company, project, conversationId } = useLocalSearchParams();
+
     return (
         <Tabs screenOptions={{ headerShown: false, tabBarActiveTintColor: colors.primary.DEFAULT }}>
             <Tabs.Screen
@@ -12,6 +14,7 @@ export default function TabLayout() {
                     tabBarIcon: ({ color }) => <FontAwesome size={28} name="comments" color={color} />,
                     headerShown: false,
                 }}
+                initialParams={{ company, project, conversationId }}
             />
             <Tabs.Screen
                 name="summary"
@@ -20,6 +23,7 @@ export default function TabLayout() {
                     tabBarIcon: ({ color }) => <FontAwesome size={28} name="list-ul" color={color} />,
                     headerShown: false,
                 }}
+                initialParams={{ company, project, conversationId }}
             />
         </Tabs>
     );

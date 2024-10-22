@@ -1,26 +1,51 @@
-import React, { useState, useRef } from 'react';
-import { View, Button, Dimensions } from 'react-native';
-import { WebView } from 'react-native-webview';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { View, Button, Dimensions, ActivityIndicator } from 'react-native';
+import { WebView, WebViewMessageEvent } from 'react-native-webview';
+import { Id } from '../../../convex/_generated/dataModel';
+import { useMutation, useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
+import { colors } from '@/constants/Colors';
 
-export function MobileEditor() {
+type Props = { conversationId: Id<'conversations'>; };
+export function MobileEditor({ conversationId }: Props) {
   const [html, setHtml] = useState('');
   const webViewRef = useRef(null);
   const windowHeight = Dimensions.get('window').height;
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const saveHtml = () => {
-    webViewRef.current?.injectJavaScript(`
-      window.ReactNativeWebView.postMessage(JSON.stringify({
-        type: 'save',
-        html: quill.root.innerHTML
-      }));
-    `);
-  };
+  const summary = useQuery(api.summaries.getLatestSummary, { conversationId });
+  const updateSummary = useMutation(api.summaries.addSummary);
+
+  useEffect(() => {
+    if (summary) {
+      setHtml(summary);
+    }
+  }, [summary]);
+
+  const debounce = useCallback((func: Function, delay: number) => {
+    return (...args: any[]) => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+      timerRef.current = setTimeout(() => {
+        func(...args);
+      }, delay);
+    };
+  }, []);
+
+  const debouncedSave = useCallback(
+    debounce((value: string) => {
+      updateSummary({ conversationId, summary: value })
+        .catch(error => console.error('Failed to update summary:', error));
+    }, 5000),
+    [conversationId, updateSummary]
+  );
 
   const handleMessage = (event: WebViewMessageEvent) => {
     const data = JSON.parse(event.nativeEvent.data);
-    if (data.type === 'save') {
-      console.log('Saved HTML:', data.html);
-      console.log(JSON.stringify(data.html, null, 2));
+    if (data.type === 'contentChange') {
+      setHtml(data.html);
+      debouncedSave(data.html);
     }
   };
 
@@ -59,10 +84,24 @@ export function MobileEditor() {
           }
         });
         quill.root.innerHTML = ${JSON.stringify(html)};
+        quill.on('text-change', function() {
+          window.ReactNativeWebView.postMessage(JSON.stringify({
+            type: 'contentChange',
+            html: quill.root.innerHTML
+          }));
+        });
       </script>
     </body>
     </html>
   `;
+
+  if (!summary) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" color={colors.primary.DEFAULT} />
+      </View>
+    );
+  }
 
   return (
     <View className='flex-1'>
@@ -72,7 +111,6 @@ export function MobileEditor() {
         onMessage={handleMessage}
         style={{ height: windowHeight - 50 }}
       />
-      <Button title="Save" onPress={saveHtml} />
     </View>
   );
 }
