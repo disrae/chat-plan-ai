@@ -1,7 +1,8 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { action, internalAction, mutation, query } from "./_generated/server";
-import { internal } from "./_generated/api";
+import { internalAction, action, internalMutation, mutation, query } from "./_generated/server";
+import { api, internal } from "./_generated/api";
 import { v } from "convex/values";
+import { } from "openai";
 
 export const list = query({
     args: { conversationId: v.id("conversations") },
@@ -144,3 +145,14 @@ export const getConversationMessages = query({
         return messages;
     },
 });
+
+export const storeSummary = internalMutation({
+    args: { conversationId: v.id("conversations"), summary: v.string() },
+    handler: async (ctx, { conversationId, summary }) => {
+        await ctx.db.insert("summaries", {
+            conversationId,
+            html: summary,
+        });
+    },
+});
+

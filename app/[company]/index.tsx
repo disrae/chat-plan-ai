@@ -55,10 +55,6 @@ export default function CompanyDashboard() {
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredProjects, setFilteredProjects] = useState(business?.projects || []);
     const [popup, setPopup] = useState<{ type: 'settings' | ''; }>({ type: '' });
-    const [expoPushToken, setExpoPushToken] = useState('');
-    const [notification, setNotification] = useState<Notifications.Notification | undefined>(
-        undefined
-    );
     const notificationListener = useRef<Notifications.Subscription>();
     const responseListener = useRef<Notifications.Subscription>();
     const updateUser = useMutation(api.users.updateUser);
@@ -109,22 +105,19 @@ export default function CompanyDashboard() {
             registerForPushNotificationsAsync()
                 .then(token => {
                     if (token) {
-                        setExpoPushToken(token);
                         updateUser({ pushToken: token })
                             .catch(error => console.error('Failed to update user push token:', error));
                     }
                 })
                 .catch((error: any) => {
                     console.error('Failed to get push token:', error);
-                    setExpoPushToken(`${error}`);
                 });
 
             notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-                setNotification(notification);
+                return;
             });
 
             responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-                console.log(response);
                 const data = response.notification.request.content.data;
                 if (data.conversationId) {
                     if (user?.accountType === 'business' && data.businessName && data.projectName) {

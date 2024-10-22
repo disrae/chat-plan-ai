@@ -56,10 +56,6 @@ export default defineSchema({
     }).index("by_conversationId", ["conversationId"]),
     summaries: defineTable({
         conversationId: v.id("conversations"),
-        sections: v.array(v.object({
-            title: v.string(),
-            bullets: v.array(v.string()),
-        })),
-        dateGenerated: v.number(),
-    }),
+        html: v.string(),
+    }).index("by_conversationId", ["conversationId"]),
 });

@@ -39,6 +39,7 @@
     "expo-web-browser": "~13.0.3",
     "fuse.js": "^7.0.0",
     "nativewind": "^2.0.11",
+    "openai": "^4.68.1",
     "oslo": "^1.2.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
