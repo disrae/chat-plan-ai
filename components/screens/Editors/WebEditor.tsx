@@ -42,7 +42,7 @@ export function WebEditor({ conversationId }: WebEditorProps) {
 
     const debouncedSave = useCallback(
         debounce((value: string) => {
-            updateSummary({ conversationId, summary: value })
+            updateSummary({ conversationId, html: value })
                 .catch(error => console.error('Failed to update summary:', error));
         }, 5000),
         [conversationId, updateSummary]
