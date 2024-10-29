@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import '../constants/styles.css';
-import { View, Text, ScrollView, Pressable, Image, SafeAreaView } from "react-native";
+import { View, Text, ScrollView, Pressable, Image, SafeAreaView, StatusBar, Platform } from "react-native";
 import { SignUp } from "@/components/popups/SignUp";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAuthActions } from "@convex-dev/auth/dist/react";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 export type HomeScreenModals = '' | 'signUp' | 'signIn';
 export default function HomePage() {
     const router = useRouter();
@@ -14,6 +15,7 @@ export default function HomePage() {
     const { signOut } = useAuthActions();
     const [modal, setModal] = useState<HomeScreenModals>('');
     const insets = useSafeAreaInsets();
+    const isAndroid = Platform.OS === 'android';
 
     useEffect(() => {
         if (!user) { return; }
@@ -27,10 +29,11 @@ export default function HomePage() {
             {modal &&
                 <SignUp setModal={setModal} initialFlow={modal} />}
             <View className="bg-primary-dark" style={{ height: insets.top }} />
+            <StatusBar barStyle="light-content" />
             <SafeAreaView className="flex-1 bg-gray-100">
                 <View className="flex-1 flex-col min-h-[100vh]">
                     {/* Header */}
-                    <View className="flex-row items-center justify-around py-2 px-8 -mx-4 bg-primary-dark lg:px-16 lg:py-4">
+                    <View className={`flex-row items-center justify-around py-2 px-8 -mx-4 bg-primary-dark lg:px-16 lg:py-4 ${isAndroid ? 'py-6' : 'py-4'}`}>
                         <View className="w-2 h-2" />
                         <View className="flex-row items-baseline">
                             <Text className="text-3xl text-gray-100 font-bold tracking-tighter sm:text-4xl md:text-5xl">ChatPlan</Text>
