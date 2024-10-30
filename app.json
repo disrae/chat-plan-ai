@@ -46,9 +46,6 @@
       "iosDisplayInForeground": true,
       "androidMode": "default",
       "androidCollapsedTitle": "#{unread_notifications} new messages"
-    },
-    "webPushNotifications": {
-      "publicKey": "BBwKIFchI-4t_nhyCm1TGy-yex5ehyLXNO1h6sQRNk5fVQ6hf6yoHLOGWa3ri9oG1sELMRJE8TDaTFiJHTGq6iI"
     }
   }
 }
