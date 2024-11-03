@@ -19,7 +19,8 @@ export const getSummary = query({
         const summary = await ctx.db
             .query("summaries")
             .withIndex("by_conversationId", (q) => q.eq("conversationId", conversationId))
-            .unique();
+            .order("desc")
+            .first();
 
         return summary ? summary.html : "";
     },
