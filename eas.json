@@ -6,13 +6,31 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "channel": "development",
+      "env": {
+        "EXPO_PUBLIC_CONVEX_URL": "https://groovy-nightingale-348.convex.cloud",
+        "EXPO_PUBLIC_CONVEX_SITE": "https://groovy-nightingale-348.convex.site",
+        "AUTH_RESEND_KEY": "re_8xzZwFbM_NcFZunViHTtiC3sEskBZJDgZ"
+      }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "channel": "preview",
+      "env": {
+        "EXPO_PUBLIC_CONVEX_URL": "https://groovy-nightingale-348.convex.cloud",
+        "EXPO_PUBLIC_CONVEX_SITE": "https://groovy-nightingale-348.convex.site",
+        "AUTH_RESEND_KEY": "re_8xzZwFbM_NcFZunViHTtiC3sEskBZJDgZ"
+      }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "channel": "production",
+      "env": {
+        "EXPO_PUBLIC_CONVEX_URL": "https://handsome-greyhound-368.convex.cloud",
+        "EXPO_PUBLIC_CONVEX_SITE": "https://handsome-greyhound-368.convex.site",
+        "AUTH_RESEND_KEY": "re_8xzZwFbM_NcFZunViHTtiC3sEskBZJDgZ"
+      }
     }
   },
   "submit": {

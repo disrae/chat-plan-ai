@@ -9,7 +9,7 @@ npm-debug.*
 *.mobileprovision
 *.orig.*
 web-build/
-.env.local
+.env*
 
 # macOS
 .DS_Store
@@ -28,3 +28,5 @@ expo-env.d.ts
 ios
 android
 ignore/
+
+eas.json
