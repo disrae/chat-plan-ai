@@ -87,7 +87,6 @@ export default function HomePage() {
                                     </View>
                                     <Image
                                         source={require("../assets/images/example.png")}
-                                        resizeMode="cover"
                                         style={{ width: '100%', height: 375 }}
                                         className="rounded-lg"
                                     />
