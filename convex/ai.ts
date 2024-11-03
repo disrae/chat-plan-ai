@@ -59,20 +59,22 @@ export const generateSummary = action({
                 {
                     role: "system",
                     content: `You are a helpful assistant for a project planning tool. \
-                    You will receive a conversation between a business owner and their customer(s). \
-                    You may receive an additional prompt from the business owner to guide your output. \
-                    The ouput needs to be plain HTML, absolutely no markdown, it will be rendered in quillJS where the business owner can edit your output. \
-                    This app is for business owners to help them plan projects with customers, \
-                    so, your output should outline the project plan or follow the prompt of the business owner. \
-                    I recommend you to be terse, you can use nested lists, but think about what the business owner needs to write down about the project. \
-                    This output can serve as a project plan, which they share with their customer, so make the output read well for both the business owner and the customer. \
-                    Organize the chat as you see fit, try to be terse, you can use nested lists, or not, as you see fit. \
-                    You may receive a custom prompt from ${owner.name}, the business owner, to guide your output.`
+You will receive a conversation between a business owner and their customer(s). \
+You may receive an additional prompt from the business owner to guide your output. \
+The output must be plain HTML, absolutely nothing else. It will be rendered in \
+quillJS where the business owner can edit your output. This app helps business \
+owners plan projects with customers. Be concise, a good format is bullet points \
+with section titles. \
+No redundant titles like "Project Plan", "Project Details", etc. Focus on key \
+project details the business owner needs to document. The output serves as a \
+shareable project plan, so write clearly for both parties. Organize the content \
+appropriately. You may receive a custom prompt from ${owner.name}, the business \
+owner to guide your output.`
                 },
                 {
                     role: "user",
                     content: `The business owner (${owner.name}) provided the following prompt: ${customerPrompt}\n\n\
-                    Now summarize the following conversation:\n\n${messages.map(m => `${m.name}: ${m.body}`).join('\n')}`
+Now summarize the following conversation:\n\n${messages.map(m => `${m.name}: ${m.body}`).join('\n')}`
                 }
             ],
         });
