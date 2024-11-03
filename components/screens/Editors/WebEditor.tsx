@@ -19,6 +19,8 @@ export function WebEditor({ conversationId }: WebEditorProps) {
     const summary = useQuery(api.summaries.getLatestSummary, { conversationId });
     const updateSummary = useMutation(api.summaries.addSummary);
 
+    // console.log(JSON.stringify(summary, null, 2));
+
     useEffect(() => {
         setIsClient(true);
     }, []);

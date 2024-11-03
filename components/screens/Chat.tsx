@@ -6,6 +6,8 @@ import * as Clipboard from 'expo-clipboard';
 import { useQuery, useMutation, Id, useAction } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { ShareInfo } from '../popups/ShareInfo';
+import { Popup } from '../utils/Popup';
+import { colors } from '@/constants/Colors';
 
 type ChatScreenProps = {
     conversationId: Id<'conversations'>;
@@ -21,10 +23,17 @@ export function ChatScreen({ conversationId, isBusinessOwner, onBackPress }: Cha
     const messages = useQuery(api.messages.list, { conversationId });
     const send = useMutation(api.messages.send);
     const [loading, setLoading] = useState<'sending' | ''>('');
-    const [modal, setModal] = useState<{ type: 'share-info' | ''; payload?: { shareLink: string; }; }>({ type: '' });
+    const [modal, setModal] = useState<{
+        type: 'share-info' | 'generate-summary' | '';
+        payload?: {
+            shareLink?: string;
+            customerPrompt?: string;
+        };
+    }>({ type: '' });
     const flatListRef = useRef<FlatList>(null);
-    const generateSummary = useAction(api.openai.generateSummary);
+    const generateSummary = useAction(api.ai.generateSummary);
     const [isSummarizing, setIsSummarizing] = useState(false);
+    const router = useRouter();
 
     useEffect(() => {
         if (flatListRef.current && messages) {
@@ -63,16 +72,21 @@ export function ChatScreen({ conversationId, isBusinessOwner, onBackPress }: Cha
         }
     };
 
-
-    const handleGenerateSummary = async () => {
-        console.log('generating summary');
+    const handleGenerateSummary = async (customerPrompt?: string) => {
+        setModal({ type: '' });
         setIsSummarizing(true);
         try {
-            await generateSummary({ conversationId });
+            await generateSummary({ conversationId, customerPrompt: customerPrompt || '' });
+            if (isBusinessOwner && conversation) {
+                router.push(`/${conversation.businessName}/${conversation.projectName}/${conversationId}/summary`);
+            } else {
+                router.push(`/conversations/${conversationId}/summary`);
+            }
         } catch (error) {
             console.error("Failed to generate summary:", error);
         } finally {
             setIsSummarizing(false);
+            setModal({ type: '' });
         }
     };
 
@@ -86,6 +100,39 @@ export function ChatScreen({ conversationId, isBusinessOwner, onBackPress }: Cha
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             >
                 {modal.type === 'share-info' && <ShareInfo setModal={setModal} shareLink={modal.payload?.shareLink} />}
+                {modal.type === 'generate-summary' && (
+                    <Popup onClose={() => setModal({ type: '' })}>
+                        <View className="p-6">
+                            <Text className="text-xl font-bold mb-4">Generate Summary</Text>
+                            <Text className="text-gray-600 mb-4">
+                                Would you like to provide a prompt for the summary? (Optional)
+                            </Text>
+                            <TextInput
+                                className="border border-gray-300 rounded p-2 mb-4 min-h-[100px]"
+                                multiline
+                                placeholder="E.g., Focus on project timeline and key deliverables..."
+                                placeholderTextColor="#aaa"
+                                onChangeText={(text) => setModal(prev => ({
+                                    ...prev,
+                                    payload: { ...prev.payload, customerPrompt: text }
+                                }))}
+                                value={modal.payload?.customerPrompt}
+                            />
+                            <View className="flex-row justify-end gap-2">
+                                <Pressable
+                                    className="px-4 py-2 rounded"
+                                    onPress={() => setModal({ type: '' })}>
+                                    <Text>Cancel</Text>
+                                </Pressable>
+                                <Pressable
+                                    className="bg-primary px-4 py-2 rounded"
+                                    onPress={() => handleGenerateSummary(modal.payload?.customerPrompt)}>
+                                    <Text className="text-white">Generate</Text>
+                                </Pressable>
+                            </View>
+                        </View>
+                    </Popup>
+                )}
                 <SafeAreaView className='flex-1'>
                     {/* Header */}
                     <View className='bg-primary-dark'>
@@ -109,7 +156,7 @@ export function ChatScreen({ conversationId, isBusinessOwner, onBackPress }: Cha
                             <View className='flex-row items-center justify-end pb-4 bg-primary-dark'>
                                 <Pressable
                                     className='flex-row items-center px-2 bg-slate-200 py-2 mr-2 rounded'
-                                    onPress={handleGenerateSummary}
+                                    onPress={() => setModal({ type: 'generate-summary' })}
                                     hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
                                     <FontAwesome name="file-text-o" size={16} color="black" />
                                     <Text className='text font-medium text-right ml-1'>
@@ -131,25 +178,32 @@ export function ChatScreen({ conversationId, isBusinessOwner, onBackPress }: Cha
                     </View>
 
                     {/* Messages */}
-                    <FlatList
-                        ref={flatListRef}
-                        className='bg-white px-4'
-                        data={messages ?? []}
-                        contentContainerStyle={{ marginBottom: 20 }}
-                        onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
-                        renderItem={({ item }) => {
-                            const isAuthor = item?.author === user?._id;
-                            return (
-                                <View className={`flex-row my-1 ${isAuthor ? 'justify-end' : 'justify-start'}`}>
-                                    <View className={`max-w-[75%] p-2 rounded-lg shadow-sm ${isAuthor ? 'bg-primary rounded-br-none' : 'bg-slate-600 border-gray-300 rounded-bl-none'}`}>
-                                        {!isAuthor && <Text className='text-white text-[8px]'>{item?.name}</Text>}
-                                        <Text className='text-gray-50'>{item?.body}</Text>
+                    <View className="flex-1 bg-white">
+                        <FlatList
+                            ref={flatListRef}
+                            className='bg-white px-4'
+                            data={messages ?? []}
+                            contentContainerStyle={{ marginBottom: 20 }}
+                            onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+                            renderItem={({ item }) => {
+                                const isAuthor = item?.author === user?._id;
+                                return (
+                                    <View className={`flex-row my-1 ${isAuthor ? 'justify-end' : 'justify-start'}`}>
+                                        <View className={`max-w-[75%] p-2 rounded-lg shadow-sm ${isAuthor ? 'bg-primary rounded-br-none' : 'bg-slate-600 border-gray-300 rounded-bl-none'}`}>
+                                            {!isAuthor && <Text className='text-white text-[8px]'>{item?.name}</Text>}
+                                            <Text className='text-gray-50'>{item?.body}</Text>
+                                        </View>
                                     </View>
-                                </View>
-                            );
-                        }}
-                        keyExtractor={(item) => item._id}
-                    />
+                                );
+                            }}
+                            keyExtractor={(item) => item._id}
+                        />
+                        {isSummarizing && (
+                            <View className="absolute inset-0 justify-center items-center bg-white/50">
+                                <ActivityIndicator size="large" color={colors.primary.DEFAULT} />
+                            </View>
+                        )}
+                    </View>
 
                     {/* Input */}
                     <View className='bg-slate-50 px-2 py-2'>

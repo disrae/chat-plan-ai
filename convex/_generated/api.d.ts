@@ -18,11 +18,11 @@ import type {
 import type * as CustomPassword from "../CustomPassword.js";
 import type * as ResendOTP from "../ResendOTP.js";
 import type * as ResendOTPPasswordReset from "../ResendOTPPasswordReset.js";
+import type * as ai from "../ai.js";
 import type * as auth from "../auth.js";
 import type * as conversations from "../conversations.js";
 import type * as http from "../http.js";
 import type * as messages from "../messages.js";
-import type * as openai from "../openai.js";
 import type * as projects from "../projects.js";
 import type * as summaries from "../summaries.js";
 import type * as users from "../users.js";
@@ -39,11 +39,11 @@ declare const fullApi: ApiFromModules<{
   CustomPassword: typeof CustomPassword;
   ResendOTP: typeof ResendOTP;
   ResendOTPPasswordReset: typeof ResendOTPPasswordReset;
+  ai: typeof ai;
   auth: typeof auth;
   conversations: typeof conversations;
   http: typeof http;
   messages: typeof messages;
-  openai: typeof openai;
   projects: typeof projects;
   summaries: typeof summaries;
   users: typeof users;

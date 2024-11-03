@@ -195,3 +195,10 @@ export const getProjectByName = query({
         return project;
     },
 });
+
+export const getById = query({
+    args: { userId: v.id("users") },
+    handler: async (ctx, { userId }) => {
+        return ctx.db.get(userId);
+    },
+});
