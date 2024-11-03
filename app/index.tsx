@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import '../constants/styles.css';
-import { View, Text, ScrollView, Pressable, Image, SafeAreaView, StatusBar, Platform } from "react-native";
+import { Image } from 'expo-image';
+import { View, Text, ScrollView, Pressable, SafeAreaView, StatusBar, Platform } from "react-native";
 import { SignUp } from "@/components/popups/SignUp";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -35,9 +36,14 @@ export default function HomePage() {
                     {/* Header */}
                     <View className={`flex-row items-center justify-around py-2 px-8 -mx-4 bg-primary-dark lg:px-16 lg:py-4 ${isAndroid ? 'py-6' : 'py-4'}`}>
                         <View className="w-2 h-2" />
-                        <View className="flex-row items-baseline">
-                            <Text className="text-3xl text-gray-100 font-bold tracking-tighter sm:text-4xl md:text-5xl">ChatPlan</Text>
-                            {/* <Text className="text-xs text-gray-300 ml-1">openbeta</Text> */}
+                        <View className="flex-row items-center gap-2">
+                            <Image
+                                className="w-10 h-10 "
+                                source="assets/icon_web/icon_circle.png"
+                                contentFit="cover"
+                                transition={300} />
+                            <Text className="text-3xl text-gray-100 font-bold tracking-tighter sm:text-4xl md:text-5xl ">ChatPlanAI
+                                <Text className="text-sm text-gray-200 tracking-normal ml-1">openbeta</Text></Text>
                         </View>
                         <View className="flex-row ml-auto space-x-2 sm:space-x-4 lg:space-x-10">
                             <Pressable
