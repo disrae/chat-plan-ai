@@ -39,11 +39,11 @@ export default function HomePage() {
                         <View className="flex-row items-center gap-2">
                             <Image
                                 className="w-10 h-10 "
-                                source="assets/icon_web/icon_circle.png"
+                                source={require("../assets/icon_web/icon_circle.png")}
                                 contentFit="cover"
                                 transition={300} />
                             <Text className="text-3xl text-gray-100 font-bold tracking-tighter sm:text-4xl md:text-5xl ">ChatPlanAI
-                                <Text className="text-sm text-gray-200 tracking-normal ml-1">openbeta</Text></Text>
+                                <Text className="text-xs text-gray-200 tracking-normal ml-1">openbeta</Text></Text>
                         </View>
                         <View className="flex-row ml-auto space-x-2 sm:space-x-4 lg:space-x-10">
                             <Pressable
