@@ -1,41 +1,83 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { colors } from '@/constants/Colors';
-import { View, Text, StatusBar, SafeAreaView } from 'react-native';
+import { View, Text, StatusBar, SafeAreaView, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams, useSegments } from 'expo-router';
 import { MobileEditor } from '@/components/screens/Editors/MobileEditor';
 import { Id } from '@/convex/_generated/dataModel';
+import { useAction } from 'convex/react';
+import { api } from '@/convex/_generated/api';
+import { RegeneratePopup, SummaryOptions } from '@/components/screens/Summary/RegeneratePopup';
+import { AntDesign, FontAwesome } from '@expo/vector-icons';
 
 export default function Summary() {
     const insets = useSafeAreaInsets();
     const router = useRouter();
     const params = useLocalSearchParams();
+    const { conversationId } = params;
+    const generateSummary = useAction(api.ai.generateSummary);
+    const [showRegeneratePopup, setShowRegeneratePopup] = useState(false);
+    const [loading, setLoading] = useState<'' | 'Generating summary...'>('');
 
-    const conversationId = params.conversationId as Id<'conversations'>;
+    const handleRegenerate = async (options: SummaryOptions) => {
+        try {
+            setLoading('Generating summary...');
+            await generateSummary({
+                conversationId: conversationId as Id<'conversations'>,
+                options: options
+            });
+        } catch (error) {
+            console.error('Failed to regenerate summary:', error);
+        } finally {
+            setLoading('');
+        }
+    };
 
-    const onBackPress = () => {
+    const handleBack = () => {
         router.back();
     };
 
     return (
         <View className='flex-1'>
+            {showRegeneratePopup && (
+                <RegeneratePopup
+                    loading={loading}
+                    onClose={() => setShowRegeneratePopup(false)}
+                    onSubmit={(options) => {
+                        handleRegenerate(options);
+                        setShowRegeneratePopup(false);
+                    }}
+                />
+            )}
             <StatusBar barStyle="light-content" />
             <View style={{ height: insets.top, backgroundColor: colors.primary.dark }} />
             <SafeAreaView className='flex-1'>
 
                 {/* Header */}
-                <View className='bg-primary-dark'>
-                    <View className='flex-row justify-center items-center px-4'>
-                        <View className='py-2'>
-                            <Text className='text-slate-100 text-xl font-medium text-right'>
-                                Summary
+                <View className='bg-primary-dark flex-row justify-between items-center px-4 py-2 pb-4'>
+                    <Pressable
+                        onPress={handleBack}
+                        style={{ padding: 8 }}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                        <AntDesign name="arrowleft" size={32} color="white" />
+                    </Pressable>
+
+                    <View className='flex-col'>
+                        <Text className='text-slate-100 text-xl font-medium text-right mb-2'>Summary</Text>
+                        <Pressable
+                            className='flex-row items-center px-3 py-2 bg-slate-200 rounded'
+                            onPress={() => setShowRegeneratePopup(true)}
+                            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                            <FontAwesome name="refresh" size={16} color="black" />
+                            <Text className='font-medium ml-2'>
+                                {loading ? 'Generating...' : 'Regenerate'}
                             </Text>
-                        </View>
+                        </Pressable>
                     </View>
                 </View>
 
                 {/* Editor */}
-                <MobileEditor conversationId={conversationId} />
+                <MobileEditor conversationId={conversationId as Id<'conversations'>} />
 
             </SafeAreaView>
         </View>

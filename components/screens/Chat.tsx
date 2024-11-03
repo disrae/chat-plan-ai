@@ -76,7 +76,14 @@ export function ChatScreen({ conversationId, isBusinessOwner, onBackPress }: Cha
         setModal({ type: '' });
         setIsSummarizing(true);
         try {
-            await generateSummary({ conversationId, customerPrompt: customerPrompt || '' });
+            await generateSummary({
+                conversationId,
+                options: {
+                    preserveDocument: false,
+                    includeChat: true,
+                    customPrompt: customerPrompt || undefined
+                }
+            });
             if (isBusinessOwner && conversation) {
                 router.push(`/${conversation.businessName}/${conversation.projectName}/${conversationId}/summary`);
             } else {
@@ -138,9 +145,9 @@ export function ChatScreen({ conversationId, isBusinessOwner, onBackPress }: Cha
                     <View className='bg-primary-dark'>
                         <View className='flex-row justify-between items-center px-4'>
                             <Pressable onPress={onBackPress} className='' hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                                <AntDesign name="arrowleft" size={24} color="white" />
+                                <AntDesign name="arrowleft" style={{ padding: 8 }} size={32} color="white" />
                             </Pressable>
-                            <View className='flex-1 py-2 pl-2'>
+                            <View className='flex-1 py-2 pb-4 pl-2'>
                                 <Text className='text-slate-100 text-lg font-medium text-right'>
                                     {conversation.businessName}
                                 </Text>
@@ -150,31 +157,31 @@ export function ChatScreen({ conversationId, isBusinessOwner, onBackPress }: Cha
                                 <Text className='text-slate-100 text-right pt-1'>
                                     {conversation.name}
                                 </Text>
+                                {isBusinessOwner && (
+                                    <View className='flex-row items-center justify-end pt-4 bg-primary-dark'>
+                                        <Pressable
+                                            className='flex-row items-center px-2 bg-slate-200 py-2 mr-2 rounded'
+                                            onPress={() => setModal({ type: 'generate-summary' })}
+                                            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                                            <FontAwesome name="file-text-o" size={16} color="black" />
+                                            <Text className='text font-medium text-right ml-1'>
+                                                {isSummarizing ? 'Generating...' : 'Generate Summary'}
+                                            </Text>
+                                        </Pressable>
+                                        <View className='w-2' />
+                                        <Pressable
+                                            className='flex-row items-center px-2 bg-slate-200 py-2 rounded'
+                                            onPress={copyToClipboard}
+                                            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                                            <EvilIcons name="link" size={20} color="black" />
+                                            <Text className='text font-medium text-right ml-1'>
+                                                Share Chat
+                                            </Text>
+                                        </Pressable>
+                                    </View>
+                                )}
                             </View>
                         </View>
-                        {isBusinessOwner && (
-                            <View className='flex-row items-center justify-end pb-4 bg-primary-dark'>
-                                <Pressable
-                                    className='flex-row items-center px-2 bg-slate-200 py-2 mr-2 rounded'
-                                    onPress={() => setModal({ type: 'generate-summary' })}
-                                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                                    <FontAwesome name="file-text-o" size={16} color="black" />
-                                    <Text className='text font-medium text-right ml-1'>
-                                        {isSummarizing ? 'Generating...' : 'Generate Summary'}
-                                    </Text>
-                                </Pressable>
-                                <View className='w-2' />
-                                <Pressable
-                                    className='flex-row items-center px-2 bg-slate-200 py-2 mr-4 rounded'
-                                    onPress={copyToClipboard}
-                                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                                    <EvilIcons name="link" size={20} color="black" />
-                                    <Text className='text font-medium text-right ml-1'>
-                                        Share Chat
-                                    </Text>
-                                </Pressable>
-                            </View>
-                        )}
                     </View>
 
                     {/* Messages */}

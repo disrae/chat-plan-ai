@@ -23,8 +23,15 @@ const client = new OpenAI({
 });
 
 export const generateSummary = action({
-    args: { conversationId: v.id("conversations"), customerPrompt: v.string() },
-    handler: async (ctx, { conversationId, customerPrompt }): Promise<string> => {
+    args: {
+        conversationId: v.id("conversations"),
+        options: v.object({
+            preserveDocument: v.boolean(),
+            includeChat: v.boolean(),
+            customPrompt: v.optional(v.string())
+        })
+    },
+    handler: async (ctx, { conversationId, options }): Promise<string> => {
         // Get the current user
         const userId = await ctx.auth.getUserIdentity();
         if (!userId) { throw new Error("Not authenticated"); }
@@ -41,16 +48,28 @@ export const generateSummary = action({
             throw new Error("User is not the owner of this conversation");
         }
 
-        // Get the messages from the conversation
-        const messages = await ctx.runQuery(api.messages.list, { conversationId });
-        if (!messages || messages.length === 0) {
-            throw new Error("No messages found for this conversation");
-        }
-
         // Get the owner info
         const owner = await ctx.runQuery(api.users.getById, { userId: conversation.owner });
         if (!owner) {
             throw new Error("Owner not found");
+        }
+
+        // Get the current summary if we want to preserve it
+        let currentSummary = '';
+        if (options.preserveDocument) {
+            const summary = await ctx.runQuery(api.summaries.getSummary, { conversationId });
+            if (summary) {
+                currentSummary = summary;
+            }
+        }
+
+        // Get the messages if we want to include chat
+        let chatContent = '';
+        if (options.includeChat) {
+            const messages = await ctx.runQuery(api.messages.list, { conversationId });
+            if (messages && messages.length > 0) {
+                chatContent = messages.map(m => `${m.name}: ${m.body}`).join('\n');
+            }
         }
 
         const response = await client.chat.completions.create({
@@ -59,8 +78,9 @@ export const generateSummary = action({
                 {
                     role: "system",
                     content: `You are a helpful assistant for a project planning tool. \
-You will receive a conversation between a business owner and their customer(s). \
-You may receive an additional prompt from the business owner to guide your output. \
+${options.preserveDocument ? "You will receive the current document which should be preserved and augmented with new information. " : ""}\
+${options.includeChat ? "You will receive a conversation between a business owner and their customer(s). " : ""}\
+${options.customPrompt ? `Here are instructions directly from the business owner that should guide your output: "${options.customPrompt}"` : ""}\
 The output must be plain HTML, absolutely nothing else. It will be rendered in \
 quillJS where the business owner can edit your output. This app helps business \
 owners plan projects with customers. Be concise, a good format is bullet points \
@@ -73,8 +93,9 @@ owner to guide your output.`
                 },
                 {
                     role: "user",
-                    content: `The business owner (${owner.name}) provided the following prompt: ${customerPrompt}\n\n\
-Now summarize the following conversation:\n\n${messages.map(m => `${m.name}: ${m.body}`).join('\n')}`
+                    content: `${options.customPrompt ? `The business owner (${owner.name}) provided the following prompt: ${options.customPrompt}\n\n` : ""}\
+${options.preserveDocument ? `Current document:\n${currentSummary}\n\n` : ""}\
+${options.includeChat ? `Conversation to summarize:\n${chatContent}` : ""}`
                 }
             ],
         });

@@ -14,7 +14,12 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.disrae.chat-plan-ai"
+      "bundleIdentifier": "com.disrae.chat-plan-ai",
+      "splash": {
+        "image": "./assets/icon_web/icon_circle_c.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#ffffff"
+      }
     },
     "android": {
       "adaptiveIcon": {
