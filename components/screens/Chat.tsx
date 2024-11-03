@@ -155,7 +155,7 @@ export function ChatScreen({ conversationId, isBusinessOwner, onBackPress }: Cha
                     <View className='bg-slate-50 px-2 py-2'>
                         <View className='flex-row items-center'>
                             <TextInput
-                                className='flex-1 text-slate-800 border border-gray-400 rounded p-2 tracking-tighter'
+                                className='flex-1 text-slate-800 border border-gray-400 rounded p-2 tracking-tighter focus:border-primary focus:outline-primary'
                                 placeholder="Type a message"
                                 value={newMessage}
                                 onChangeText={setNewMessage}
