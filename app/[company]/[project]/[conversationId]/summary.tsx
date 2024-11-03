@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { colors } from '@/constants/Colors';
-import { View, Text, StatusBar, SafeAreaView, Pressable } from 'react-native';
+import { View, Text, StatusBar, SafeAreaView, Pressable, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams, useSegments } from 'expo-router';
 import { MobileEditor } from '@/components/screens/Editors/MobileEditor';
@@ -17,11 +17,11 @@ export default function Summary() {
     const { conversationId } = params;
     const generateSummary = useAction(api.ai.generateSummary);
     const [showRegeneratePopup, setShowRegeneratePopup] = useState(false);
-    const [loading, setLoading] = useState<'' | 'Generating summary...'>('');
+    const [loading, setLoading] = useState<'' | 'summary'>('');
 
     const handleRegenerate = async (options: SummaryOptions) => {
         try {
-            setLoading('Generating summary...');
+            setLoading('summary');
             await generateSummary({
                 conversationId: conversationId as Id<'conversations'>,
                 options: options
@@ -70,14 +70,21 @@ export default function Summary() {
                             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
                             <FontAwesome name="refresh" size={16} color="black" />
                             <Text className='font-medium ml-2'>
-                                {loading ? 'Generating...' : 'Regenerate'}
+                                {loading ? 'Generating...' : 'Iterate'}
                             </Text>
                         </Pressable>
                     </View>
                 </View>
 
-                {/* Editor */}
-                <MobileEditor conversationId={conversationId as Id<'conversations'>} />
+                {/* Editor with loading overlay */}
+                <View className="relative flex-1">
+                    <MobileEditor conversationId={conversationId as Id<'conversations'>} />
+                    {!!loading && (
+                        <View className="absolute inset-0 bg-white/50 flex items-center justify-center">
+                            <ActivityIndicator size="large" color={colors.primary.DEFAULT} />
+                        </View>
+                    )}
+                </View>
 
             </SafeAreaView>
         </View>

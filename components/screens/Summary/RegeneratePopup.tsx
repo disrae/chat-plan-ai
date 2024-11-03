@@ -41,8 +41,8 @@ export const RegeneratePopup = ({ onClose, onSubmit, loading }: RegeneratePopupP
                             disabled={!!loading}
                         />
                         <View className='flex flex-1'>
-                            <Text className="flex-shrink-1 font-semibold pb-2">Include current document to preserve current content?</Text>
-                            <Text className="flex-shrink-1 font-light">You can add a prompt to have the AI edit the document for you.</Text>
+                            <Text className="flex-shrink-1 font-semibold pb-2">Include current summary?</Text>
+                            <Text className="flex-shrink-1 font-light">The AI will start with your existing document rather than starting from scratch. You can add a prompt to guide how the AI should modify or enhance the current content.</Text>
                         </View>
                     </Pressable>
 
@@ -57,7 +57,10 @@ export const RegeneratePopup = ({ onClose, onSubmit, loading }: RegeneratePopupP
                             className="mx-4"
                             disabled={!!loading}
                         />
-                        <Text className="flex-shrink-1 font-semibold">Include chat</Text>
+                        <View className='flex flex-1'>
+                            <Text className="flex-shrink-1 font-semibold pb-2">Include chat</Text>
+                            <Text className="flex-shrink-1 font-light">The AI will use the chat messages to update the document with new information.</Text>
+                        </View>
                     </Pressable>
                 </View>
 
@@ -76,13 +79,14 @@ export const RegeneratePopup = ({ onClose, onSubmit, loading }: RegeneratePopupP
 
                 <View className="flex-row justify-end gap-2">
                     <Pressable
+                        className="bg-primary px-4 py-2 rounded"
                         onPress={() => onSubmit({
                             preserveDocument: includeDocument,
                             includeChat: includeChat,
                             customPrompt: customPrompt
                         })}
                         disabled={!!loading}>
-                        <Text className="text-white bg-primary px-4 py-2 rounded-lg">Regenerate</Text>
+                        <Text className="text-white font-semibold">Generate</Text>
                     </Pressable>
                 </View>
             </View>
