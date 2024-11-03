@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, TouchableWithoutFeedback, Pressable, Text } from 'react-native';
+import { View, Pressable, Text } from 'react-native';
 import { BlurView } from 'expo-blur';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 type Props = {
     onClose: () => void;
@@ -19,14 +20,14 @@ export function Popup({ onClose, children }: Props) {
                 tint="dark"
                 className="absolute w-full h-full"
             />
-            <TouchableWithoutFeedback>
+            <Pressable className='flex-1 justify-center items-center' onPress={(e) => e.stopPropagation()}>
                 <View className="bg-slate-50 rounded-lg w-11/12 max-w-lg z-20 cursor-default max-h-[80%]">
                     <Pressable className='absolute top-4 right-4 z-20' onPress={onClose}>
-                        <Text className="text-lg">✕</Text>
+                        <AntDesign name="close" size={24} color="black" />
                     </Pressable>
                     {children}
                 </View>
-            </TouchableWithoutFeedback>
+            </Pressable>
         </Pressable>
     );
 };

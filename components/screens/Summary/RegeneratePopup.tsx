@@ -67,7 +67,7 @@ export const RegeneratePopup = ({ onClose, onSubmit, loading }: RegeneratePopupP
                 <View className="mb-4">
                     <Text className="mb-2 font-semibold">Custom Prompt (optional)</Text>
                     <TextInput
-                        className="border rounded p-2 bg-background focus:border-primary focus:outline-primary"
+                        className="border rounded p-2 bg-background focus:border-primary focus:outline-primary min-h-[100px] flex-1 flex-grow"
                         value={customPrompt}
                         onChangeText={setCustomPrompt}
                         multiline

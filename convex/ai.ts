@@ -6,7 +6,7 @@ import { OpenAI } from "openai";
 const providers = {
     openai: {
         apiKey: process.env.OPENAI_API_KEY,
-        model: "gpt-4o",
+        model: "gpt-4o mini",
         baseURL: "https://api.openai.com/v1",
     },
     xai: {
