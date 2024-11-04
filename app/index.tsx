@@ -38,7 +38,7 @@ export default function HomePage() {
                         <View className="w-2 h-2" />
                         <View className="flex-row items-center gap-2">
                             <Image
-                                className="w-6 h-6 "
+                                className="w-6 h-6 md:w-8 md:h-8 lg:w-10 lg:h-10"
                                 source={require("../assets/icon_web/icon_circle.png")}
                                 contentFit="cover"
                                 transition={300} />
