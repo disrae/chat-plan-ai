@@ -21,7 +21,7 @@ export function Popup({ onClose, children }: Props) {
                 className="absolute w-full h-full"
             />
             <Pressable className='flex-1 justify-center items-center' onPress={(e) => e.stopPropagation()}>
-                <View className="bg-slate-50 rounded-lg w-11/12 max-w-lg z-20 cursor-default max-h-[80%]">
+                <View className="bg-slate-50 rounded-lg max-w-lg z-20 cursor-default max-h-[80%]">
                     <Pressable className='absolute top-4 right-4 z-20' onPress={onClose}>
                         <AntDesign name="close" size={24} color="black" />
                     </Pressable>
