@@ -1,8 +1,7 @@
 import { View, Text, ScrollView, TextInput, Pressable, ActivityIndicator } from 'react-native';
 import React, { useState } from 'react';
 import { Popup } from '../utils/Popup';
-import { DashboardModals } from '@/app/[company]';
-import { ConversationModals } from '@/app/[company]/[project]/[conversationId]';
+import { ConversationModals } from '@/app/[locale]/[company]/[project]/[conversationId]';
 
 type Props = {
     setModal: React.Dispatch<React.SetStateAction<ConversationModals>>;
