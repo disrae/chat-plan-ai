@@ -115,7 +115,7 @@ export function ChatScreen({ conversationId, isBusinessOwner, onBackPress }: Cha
 
     const copyToClipboard = async () => {
         try {
-            const url = `https://chatplanai.com/jump-to/${conversation?.secret}`;
+            const url = `https://chatplanai.com/${locale}/jump-to/${conversation?.secret}`;
             await Clipboard.setStringAsync(url);
             setModal({ type: 'share-info', payload: { shareLink: url } });
         } catch (error) {
