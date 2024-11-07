@@ -1,5 +1,5 @@
 export const shadow = {
-    backgroundColor: 'white',
+    // backgroundColor: 'white',
     shadowColor: '#000',
     shadowOffset: { width: 4, height: 4 },
     shadowOpacity: 0.2,

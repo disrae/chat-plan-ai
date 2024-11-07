@@ -5,6 +5,22 @@ import { Id } from '../../../convex/_generated/dataModel';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { colors } from '@/constants/Colors';
+import { Language, useLocale } from '@/hooks/useLocale';
+
+const translations: Record<Language, Record<string, string>> = {
+    'en-ca': {
+        loading: 'Loading...'
+    },
+    'fr-ca': {
+        loading: 'Chargement...'
+    },
+    'es-mx': {
+        loading: 'Cargando...'
+    },
+    'ro-ro': {
+        loading: 'Se încarcă...'
+    }
+};
 
 interface WebEditorProps {
     conversationId: Id<'conversations'>;
@@ -15,11 +31,11 @@ export function WebEditor({ conversationId }: WebEditorProps) {
     const [content, setContent] = useState('');
     const quillRef = useRef(null);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
+    const { locale } = useLocale();
+    const t = translations[locale] ?? translations['en-ca'];
 
     const summary = useQuery(api.summaries.getLatestSummary, { conversationId });
     const updateSummary = useMutation(api.summaries.addSummary);
-
-    // console.log(JSON.stringify(summary, null, 2));
 
     useEffect(() => {
         setIsClient(true);

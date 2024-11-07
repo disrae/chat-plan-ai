@@ -6,19 +6,116 @@ import { useRouter } from 'expo-router';
 import { shadow } from '@/constants/styles';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { HomeScreenModals } from '@/app';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { useZodErrorHandler } from '@/hooks/useZodErrorHandler';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { HomeScreenModals } from '@/app/[locale]';
+import { Language } from '@/hooks/useLocale';
+
+const translations: Record<Language, Record<string, string>> = {
+    'en-ca': {
+        signUp: 'Sign Up',
+        signIn: 'Sign In',
+        accountType: 'Account Type',
+        business: 'Business',
+        personal: 'Personal',
+        businessName: 'Business Name',
+        enterBusinessName: 'Enter your business name',
+        name: 'Name',
+        enterName: 'Enter your name',
+        email: 'Email',
+        enterEmail: 'Enter your email',
+        password: 'Password',
+        enterPassword: 'Enter your password',
+        show: 'Show',
+        hide: 'Hide',
+        verificationSent: 'A verification code was sent to your email.',
+        enterCode: 'Please enter the code below:',
+        checkEmail: 'Enter the code sent to your email',
+        verifyEmail: 'Verify Email',
+        alreadyHaveAccount: 'Already have an account? Sign In',
+        dontHaveAccount: "Don't have an account? Sign Up"
+    },
+    'fr-ca': {
+        signUp: "S'inscrire",
+        signIn: 'Connexion',
+        accountType: 'Type de compte',
+        business: 'Entreprise',
+        personal: 'Personnel',
+        businessName: "Nom de l'entreprise",
+        enterBusinessName: 'Entrez le nom de votre entreprise',
+        name: 'Nom',
+        enterName: 'Entrez votre nom',
+        email: 'Courriel',
+        enterEmail: 'Entrez votre courriel',
+        password: 'Mot de passe',
+        enterPassword: 'Entrez votre mot de passe',
+        show: 'Afficher',
+        hide: 'Masquer',
+        verificationSent: 'Un code de vérification a été envoyé à votre courriel.',
+        enterCode: 'Veuillez entrer le code ci-dessous:',
+        checkEmail: 'Entrez le code envoyé à votre courriel',
+        verifyEmail: 'Vérifier le courriel',
+        alreadyHaveAccount: 'Vous avez déjà un compte? Connexion',
+        dontHaveAccount: "Vous n'avez pas de compte? S'inscrire"
+    },
+    'es-mx': {
+        signUp: "Registrarse",
+        signIn: 'Iniciar sesión',
+        accountType: 'Tipo de cuenta',
+        business: 'Empresa',
+        personal: 'Personal',
+        businessName: 'Nombre de la empresa',
+        enterBusinessName: 'Ingrese el nombre de su empresa',
+        name: 'Nombre',
+        enterName: 'Ingrese su nombre',
+        email: 'Correo electrónico',
+        enterEmail: 'Ingrese su correo electrónico',
+        password: 'Contraseña',
+        enterPassword: 'Ingrese su contraseña',
+        show: 'Mostrar',
+        hide: 'Ocultar',
+        verificationSent: 'Se ha enviado un código de verificación a su correo electrónico.',
+        enterCode: 'Por favor ingrese el código a continuación:',
+        checkEmail: 'Ingrese el código enviado a su correo electrónico',
+        verifyEmail: 'Verificar correo',
+        alreadyHaveAccount: '¿Ya tiene una cuenta? Iniciar sesión',
+        dontHaveAccount: "¿No tiene una cuenta? Registrarse"
+    },
+    'ro-ro': {
+        signUp: "Înregistrare",
+        signIn: 'Conectare',
+        accountType: 'Tip cont',
+        business: 'Business',
+        personal: 'Personal',
+        businessName: 'Nume companie',
+        enterBusinessName: 'Introduceți numele companiei',
+        name: 'Nume',
+        enterName: 'Introduceți numele',
+        email: 'Email',
+        enterEmail: 'Introduceți email-ul',
+        password: 'Parolă',
+        enterPassword: 'Introduceți parola',
+        show: 'Arată',
+        hide: 'Ascunde',
+        verificationSent: 'Un cod de verificare a fost trimis pe email-ul dvs.',
+        enterCode: 'Vă rugăm să introduceți codul mai jos:',
+        checkEmail: 'Introduceți codul trimis pe email',
+        verifyEmail: 'Verifică email-ul',
+        alreadyHaveAccount: 'Aveți deja cont? Conectare',
+        dontHaveAccount: "Nu aveți cont? Înregistrare"
+    }
+};
 
 type Props = {
     setModal: Dispatch<React.SetStateAction<HomeScreenModals>>;
     initialFlow?: 'signUp' | 'signIn';
+    locale?: Language;
 };
 
 export function SignUp({
     setModal,
-    initialFlow = 'signUp'
+    initialFlow = 'signUp',
+    locale = 'en-ca'
 }: Props) {
     const router = useRouter();
     const { signIn } = useAuthActions();
@@ -36,6 +133,7 @@ export function SignUp({
     const [flow, setFlow] = useState(initialFlow);
 
     const { handleError, errors } = useZodErrorHandler();
+    const t = translations[locale] ?? translations['en-ca'];
 
     const handleSignUp = async () => {
         setLoading('signUp');
@@ -75,7 +173,7 @@ export function SignUp({
         <Popup onClose={() => setModal('')}>
             <ScrollView className="p-6 max-w-lg rounded-lg">
                 <View className="flex-row justify-between items-center">
-                    <Text className="text-xl font-bold">{flow === 'signUp' ? 'Sign Up' : 'Sign In'}
+                    <Text className="text-xl font-bold">{flow === 'signUp' ? t.signUp : t.signIn}
                     </Text>
                 </View>
 
@@ -83,25 +181,25 @@ export function SignUp({
                     ?
                     <View className="">
                         <View className='py-4 gap-1'>
-                            <Text className="">A verification code was sent to your email.</Text>
-                            <Text className="">Please enter the code below:</Text>
+                            <Text className="">{t.verificationSent}</Text>
+                            <Text className="">{t.enterCode}</Text>
                         </View>
                         <TextInput
                             value={verificationCode}
                             onChangeText={setVerificationCode}
                             className="border focus:outline-primary rounded-md p-2"
-                            placeholder="Check your email for a verification code"
+                            placeholder={t.checkEmail}
                         />
 
                         <Pressable onPress={handleVerifyEmail} className='bg-primary py-2 rounded-md my-4'>
-                            <Text className='text-white text-center text-lg font-medium'>Verify Email</Text>
+                            <Text className='text-white text-center text-lg font-medium'>{t.verifyEmail}</Text>
                         </Pressable>
                     </View>
                     : <>
                         {flow === 'signUp' &&
                             <View>
                                 <View className="mb-4">
-                                    <Text className="text-lg mb-1">Account Type</Text>
+                                    <Text className="text-lg mb-1">{t.accountType}</Text>
                                     <View className="flex-row gap-2">
                                         <Pressable
                                             style={[
@@ -112,7 +210,7 @@ export function SignUp({
                                             ]}
                                             onPress={() => setAccountType('business')}
                                         >
-                                            <Text className={`text-md font-medium ${accountType === 'business' ? 'text-white' : ''}`}>Business</Text>
+                                            <Text className={`text-md font-medium ${accountType === 'business' ? 'text-white' : ''}`}>{t.business}</Text>
                                         </Pressable>
                                         <Pressable
                                             style={[
@@ -123,36 +221,36 @@ export function SignUp({
                                             ]}
                                             onPress={() => setAccountType('personal')}
                                         >
-                                            <Text className={`text-md font-medium ${accountType === 'personal' ? 'text-white' : ''}`}>Personal</Text>
+                                            <Text className={`text-md font-medium ${accountType === 'personal' ? 'text-white' : ''}`}>{t.personal}</Text>
                                         </Pressable>
                                     </View>
                                 </View>
 
                                 {accountType === 'business' && (
                                     <View className="mb-4">
-                                        <Text className="text-lg mb-1">Business Name</Text>
+                                        <Text className="text-lg mb-1">{t.businessName}</Text>
                                         <TextInput
                                             value={businessName}
                                             onChangeText={setBusinessName}
                                             className="border focus:outline-primary rounded-md p-2"
-                                            placeholder="Enter your business name"
+                                            placeholder={t.enterBusinessName}
                                         />
                                     </View>
                                 )}
 
                                 <View className="mb-4">
-                                    <Text className="text-lg mb-1">Name</Text>
+                                    <Text className="text-lg mb-1">{t.name}</Text>
                                     <TextInput
                                         value={name}
                                         onChangeText={setName}
                                         className="border focus:outline-primary rounded-md p-2"
-                                        placeholder="Enter your name"
+                                        placeholder={t.enterName}
                                     />
                                 </View>
                             </View>}
 
                         <View className="mb-4">
-                            <Text className="text-lg mb-1">Email</Text>
+                            <Text className="text-lg mb-1">{t.email}</Text>
                             <TextInput
                                 value={email}
                                 onChangeText={setEmail}
@@ -160,24 +258,24 @@ export function SignUp({
                                 autoCapitalize="none"
                                 autoCorrect={false}
                                 className="border focus:outline-primary rounded-md p-2"
-                                placeholder="Enter your email"
+                                placeholder={t.enterEmail}
                             />
                         </View>
 
                         <View className="mb-4">
-                            <Text className="text-lg mb-1">Password</Text>
+                            <Text className="text-lg mb-1">{t.password}</Text>
                             <View className={`flex-row items-center border rounded-md ${isPasswordFocused ? 'outline-primary outline border-primary' : ''}`}>
                                 <TextInput
                                     value={password}
                                     onChangeText={setPassword}
                                     className="flex-1 p-2 focus:outline-none"
-                                    placeholder="Enter your password"
+                                    placeholder={t.enterPassword}
                                     secureTextEntry={!showPassword}
                                     onFocus={() => setIsPasswordFocused(true)}
                                     onBlur={() => setIsPasswordFocused(false)}
                                 />
                                 <Pressable className=' px-2 py-1' onPress={() => setShowPassword(!showPassword)}>
-                                    <Text className='text-sm font-bold text-gray-500'>{showPassword ? 'Hide' : 'Show'}</Text>
+                                    <Text className='text-sm font-bold text-gray-500'>{showPassword ? t.hide : t.show}</Text>
                                 </Pressable>
                             </View>
                         </View>
@@ -196,7 +294,7 @@ export function SignUp({
                             {loading ? (
                                 <ActivityIndicator style={{ height: 28 }} color="#fff" />
                             ) : (
-                                <Text className="text-white text-center text-lg font-medium">{flow === 'signUp' ? 'Sign Up' : 'Sign In'}</Text>
+                                <Text className="text-white text-center text-lg font-medium">{flow === 'signUp' ? t.signUp : t.signIn}</Text>
                             )}
                         </Pressable>
                         <Pressable
@@ -204,8 +302,8 @@ export function SignUp({
                             className='items-center justify-center h-12 rounded-md  bg-slate-200'
                         >
                             <Text className='text-primary font-medium'>{flow === 'signUp'
-                                ? 'Already have an account? Sign In'
-                                : 'Don\'t have an account? Sign Up'}
+                                ? t.alreadyHaveAccount
+                                : t.dontHaveAccount}
                             </Text>
                         </Pressable>
 

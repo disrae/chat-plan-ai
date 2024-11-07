@@ -20,8 +20,8 @@ export function Popup({ onClose, children }: Props) {
                 tint="dark"
                 className="absolute w-full h-full"
             />
-            <Pressable className='flex-1 justify-center items-center' onPress={(e) => e.stopPropagation()}>
-                <View className="bg-slate-50 rounded-lg max-w-lg z-20 cursor-default max-h-[80%]">
+            <Pressable className='w-full justify-center items-center px-4' onPress={(e) => e.stopPropagation()}>
+                <View className="bg-slate-50 rounded-lg w-full max-w-lg z-20 cursor-default max-h-[80vh] overflow-auto">
                     <Pressable className='absolute top-4 right-4 z-20' onPress={onClose}>
                         <AntDesign name="close" size={24} color="black" />
                     </Pressable>

@@ -3,9 +3,51 @@ import React, { useState } from 'react';
 import { Popup } from '../utils/Popup';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { DashboardModals } from '@/app/[company]';
+import { DashboardModals } from '@/app/[locale]/[company]';
+import { Language, useLocale } from '@/hooks/useLocale';
 
-type Props = { setModal: React.Dispatch<React.SetStateAction<DashboardModals>>; };
+const translations: Record<Language, Record<string, string>> = {
+    'en-ca': {
+        createProject: 'Create New Project',
+        enterDetails: 'Enter the details of your new project',
+        name: 'Name',
+        projectName: 'Project name',
+        businessError: "Uh oh! Couldn't find your business.",
+        genericError: 'Something went wrong.',
+        create: 'Create Project'
+    },
+    'fr-ca': {
+        createProject: 'Créer un nouveau projet',
+        enterDetails: 'Entrez les détails de votre nouveau projet',
+        name: 'Nom',
+        projectName: 'Nom du projet',
+        businessError: "Oups! Impossible de trouver votre entreprise.",
+        genericError: "Une erreur s'est produite.",
+        create: 'Créer le projet'
+    },
+    'es-mx': {
+        createProject: 'Crear nuevo proyecto',
+        enterDetails: 'Ingrese los detalles de su nuevo proyecto',
+        name: 'Nombre',
+        projectName: 'Nombre del proyecto',
+        businessError: "¡Ups! No pudimos encontrar su empresa.",
+        genericError: 'Algo salió mal.',
+        create: 'Crear proyecto'
+    },
+    'ro-ro': {
+        createProject: 'Creează proiect nou',
+        enterDetails: 'Introduceți detaliile noului proiect',
+        name: 'Nume',
+        projectName: 'Numele proiectului',
+        businessError: "Ups! Nu am putut găsi compania dvs.",
+        genericError: 'Ceva nu a mers bine.',
+        create: 'Creează proiect'
+    }
+};
+
+type Props = {
+    setModal: React.Dispatch<React.SetStateAction<DashboardModals>>;
+};
 
 export function AddProject({ setModal }: Props) {
     const [loading, setLoading] = useState<'creating-project' | ''>('');
@@ -13,6 +55,8 @@ export function AddProject({ setModal }: Props) {
     const [error, setError] = useState('');
     const addProject = useMutation(api.projects.addProject);
     const dashboard = useQuery(api.users.getUserDashboardData);
+    const { locale } = useLocale();
+    const t = translations[locale] ?? translations['en-ca'];
 
     const updateError = (error: string) => {
         setError(error);
@@ -26,18 +70,18 @@ export function AddProject({ setModal }: Props) {
 
                     {/* Header Section */}
                     <View className="mb-4">
-                        <Text className="text-2xl font-bold">Create New Project</Text>
+                        <Text className="text-2xl font-bold">{t.createProject}</Text>
                         <View className='h-2' />
-                        <Text className="text-gray-600">Enter the details of your new project</Text>
+                        <Text className="text-gray-600">{t.enterDetails}</Text>
                     </View>
 
                     {/* Name Input */}
                     <View className="mb-4">
-                        <Text className="font-semibold text-gray-800 ">Name</Text>
+                        <Text className="font-semibold text-gray-800 ">{t.name}</Text>
                         <View className='h-2' />
                         <TextInput
                             className="flex-1 border border-gray-300 rounded-md p-3 text-gray-800 focus:border-primary focus:outline-primary"
-                            placeholder="Project name"
+                            placeholder={t.projectName}
                             value={name}
                             onChangeText={setName}
                         />
@@ -53,7 +97,7 @@ export function AddProject({ setModal }: Props) {
                         onPress={async () => {
                             if (loading) { return; }
                             if (!dashboard?.businesses?.[0]?._id) {
-                                updateError('Uh oh! Couldn\'t find your business.');
+                                updateError(t.businessError);
                                 return;
                             }
                             setLoading('creating-project');
@@ -62,7 +106,7 @@ export function AddProject({ setModal }: Props) {
                                 setModal({ type: '' });
                             } catch (error) {
                                 console.error(error);
-                                updateError('Something went wrong.');
+                                updateError(t.genericError);
                             } finally {
                                 setLoading('');
                             }
@@ -72,7 +116,7 @@ export function AddProject({ setModal }: Props) {
                         {loading ? (
                             <ActivityIndicator style={{ height: 28 }} color="#fff" />
                         ) : (
-                            <Text className="text-white text-center text-lg font-medium">Create Project</Text>
+                            <Text className="text-white text-center text-lg font-medium">{t.create}</Text>
                         )}
                     </Pressable>
 

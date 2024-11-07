@@ -10,11 +10,12 @@ export default function HomeScreen() {
             ? NativeModules.SettingsManager.settings.AppleLocale
             : NativeModules.I18nManager.localeIdentifier;
     }, []);
+    const locale = detectedLang.toLowerCase();
 
     return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <ActivityIndicator size="large" color={colors.primary.DEFAULT} />
-            <Redirect href={`/${detectedLang}`} />
+            <Redirect href={`/${locale}`} />
         </View>
     );
 }

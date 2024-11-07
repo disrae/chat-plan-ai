@@ -15,6 +15,75 @@ import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Language, useLocale } from '@/hooks/useLocale';
+
+const translations: Record<Language, Record<string, string>> = {
+    'en-ca': {
+        projects: 'Projects & Conversations',
+        myAccount: 'My Account',
+        settings: 'Settings',
+        logout: 'Log out',
+        newProject: 'New Project',
+        searchProjects: 'Search projects...',
+        newConversation: 'New Conversation',
+        pushTokenError: 'Permission not granted to get push token for push notification!',
+        projectIdError: 'Project ID not found',
+        pushTokenUpdateError: 'Failed to update user push token:',
+        pushTokenGetError: 'Failed to get push token:'
+    },
+    'en-us': {
+        projects: 'Projects & Conversations',
+        myAccount: 'My Account',
+        settings: 'Settings',
+        logout: 'Log out',
+        newProject: 'New Project',
+        searchProjects: 'Search projects...',
+        newConversation: 'New Conversation',
+        pushTokenError: 'Permission not granted to get push token for push notification!',
+        projectIdError: 'Project ID not found',
+        pushTokenUpdateError: 'Failed to update user push token:',
+        pushTokenGetError: 'Failed to get push token:'
+    },
+    'fr-ca': {
+        projects: 'Projets et conversations',
+        myAccount: 'Mon compte',
+        settings: 'Paramètres',
+        logout: 'Déconnexion',
+        newProject: 'Nouveau projet',
+        searchProjects: 'Rechercher des projets...',
+        newConversation: 'Nouvelle conversation',
+        pushTokenError: "Permission non accordée pour obtenir le jeton d'envoi de notification!",
+        projectIdError: 'ID du projet non trouvé',
+        pushTokenUpdateError: 'Échec de la mise à jour du jeton push:',
+        pushTokenGetError: 'Échec de l\'obtention du jeton push:'
+    },
+    'es-mx': {
+        projects: 'Proyectos y conversaciones',
+        myAccount: 'Mi cuenta',
+        settings: 'Configuración',
+        logout: 'Cerrar sesión',
+        newProject: 'Nuevo proyecto',
+        searchProjects: 'Buscar proyectos...',
+        newConversation: 'Nueva conversación',
+        pushTokenError: '¡Permiso no concedido para obtener token push para notificación!',
+        projectIdError: 'ID del proyecto no encontrado',
+        pushTokenUpdateError: 'Error al actualizar el token push:',
+        pushTokenGetError: 'Error al obtener el token push:'
+    },
+    'ro-ro': {
+        projects: 'Proiecte și conversații',
+        myAccount: 'Contul meu',
+        settings: 'Setări',
+        logout: 'Deconectare',
+        newProject: 'Proiect nou',
+        searchProjects: 'Caută proiecte...',
+        newConversation: 'Conversație nouă',
+        pushTokenError: 'Permisiune neacordată pentru a obține token push pentru notificare!',
+        projectIdError: 'ID-ul proiectului nu a fost găsit',
+        pushTokenUpdateError: 'Eroare la actualizarea token-ului push:',
+        pushTokenGetError: 'Eroare la obținerea token-ului push:'
+    }
+};
 
 function handleRegistrationError(errorMessage: string) {
     return;
@@ -32,15 +101,17 @@ export default function CompanyDashboard() {
     const user = useQuery(api.users.currentUser);
     const business = dashboard?.businesses?.[0];
     const [expandedProjects, setExpandedProjects] = useState<Array<Id<'projects'>>>([]);
-    const [modal, setModal] = useState<DashboardModals>({ type: '' });
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredProjects, setFilteredProjects] = useState(business?.projects || []);
+    const [modal, setModal] = useState<DashboardModals>({ type: '' });
     const [popup, setPopup] = useState<{ type: 'settings' | ''; }>({ type: '' });
     const notificationListener = useRef<Notifications.Subscription>();
     const responseListener = useRef<Notifications.Subscription>();
     const updateUser = useMutation(api.users.updateUser);
     const fuse = new Fuse(business?.projects || [], { keys: ['name'], threshold: 0.3 });
     const insets = useSafeAreaInsets();
+    const { locale } = useLocale();
+    const t = translations[locale] ?? translations['en-ca'];
 
     async function registerForPushNotificationsAsync() {
         if (Platform.OS === 'android') {
@@ -60,13 +131,13 @@ export default function CompanyDashboard() {
                 finalStatus = status;
             }
             if (finalStatus !== 'granted') {
-                handleRegistrationError('Permission not granted to get push token for push notification!');
+                handleRegistrationError(t.pushTokenError);
                 return;
             }
             const projectId =
                 Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
             if (!projectId) {
-                handleRegistrationError('Project ID not found');
+                handleRegistrationError(t.projectIdError);
             }
             try {
                 const pushTokenString = (
@@ -87,11 +158,11 @@ export default function CompanyDashboard() {
                 .then(token => {
                     if (token) {
                         updateUser({ pushToken: token })
-                            .catch(error => console.error('Failed to update user push token:', error));
+                            .catch(error => console.error(t.pushTokenUpdateError, error));
                     }
                 })
                 .catch((error: any) => {
-                    console.error('Failed to get push token:', error);
+                    console.error(t.pushTokenGetError, error);
                 });
 
             notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
@@ -188,7 +259,7 @@ export default function CompanyDashboard() {
                                     key={conversation?._id}
                                     className="flex-row items-center bg-slate-200 py-3 px-2 rounded-md shadow"
                                     onPress={() => {
-                                        router.push(`/${company}/${project.name}/${conversation?._id}`);
+                                        router.push(`/${locale}/${company}/${project.name}/${conversation?._id}`);
                                     }}
                                 >
                                     <AntDesign style={{ paddingRight: 8 }} name="message1" size={16} color={colors.primary.DEFAULT} />
@@ -200,7 +271,7 @@ export default function CompanyDashboard() {
                             onPress={() => setModal({ type: 'addConversation', payload: { projectId: project._id } })}
                             className="flex-row items-center bg-primary py-2 px-2 rounded-md shadow mt-2"
                         >
-                            <Text className='text text-white'>+ New Conversation</Text>
+                            <Text className='text text-white'>+ {t.newConversation}</Text>
                         </Pressable>
                     </View>
                 )}
@@ -227,7 +298,7 @@ export default function CompanyDashboard() {
                                 <AntDesign name="setting" size={24} color="black" />
                             </Pressable>
                         </View>
-                        <Text className="text-xl font-semibold text-white mt-2">Projects & Conversations</Text>
+                        <Text className="text-xl font-semibold text-white mt-2">{t.projects}</Text>
                     </View>
                     {popup.type === 'settings' &&
                         <>
@@ -238,18 +309,18 @@ export default function CompanyDashboard() {
                             />
                             <View className='absolute right-8 top-10 bg-gray-50 rounded shadow z-20'>
                                 <View className='p-3 border-b border-gray-400 rounded-t'>
-                                    <Text className="font-bold text-lg">My Account</Text>
+                                    <Text className="font-bold text-lg">{t.myAccount}</Text>
                                 </View>
                                 <Pressable
-                                    onPress={() => router.push(`/${company}/settings`)}
+                                    onPress={() => router.push(`/${locale}/${company}/settings`)}
                                     className='flex-row items-center hover:bg-gray-100 p-3 border-b border-gray-300'
                                 >
                                     <AntDesign name="setting" size={18} color="black" />
-                                    <Text className="pl-3 text-base">Settings</Text>
+                                    <Text className="pl-3 text-base">{t.settings}</Text>
                                 </Pressable>
                                 <Pressable onPress={signOut} className='flex-row items-center hover:bg-gray-100 p-3'>
                                     <SimpleLineIcons name="logout" size={18} color="black" />
-                                    <Text className="pl-3 text-base">Log out</Text>
+                                    <Text className="pl-3 text-base">{t.logout}</Text>
                                 </Pressable>
                             </View>
                         </>
@@ -260,17 +331,18 @@ export default function CompanyDashboard() {
                             {/* New Project Button */}
                             <Pressable
                                 onPress={() => setModal({ type: 'addProject' })}
-                                className="flex-row bg-primary py-2 px-2 rounded-lg items-center mb-6"
+                                className="flex-row bg-primary py-2 px-2 rounded-lg items-center mb-6 shadow-lg"
+                                style={[shadow]}
                             >
                                 <Text className='text-white pr-1 -mt-[2px] text-xl font-medium '>+</Text>
-                                <Text className="text-white font-medium ">New Project</Text>
+                                <Text className="text-white font-medium ">{t.newProject}</Text>
                             </Pressable>
 
                             {/* Search Input */}
                             {!!business?.projects.length && (
                                 <TextInput
                                     className="bg-white p-2 mb-4 border rounded-lg"
-                                    placeholder="Search projects..."
+                                    placeholder={t.searchProjects}
                                     value={searchQuery}
                                     onChangeText={setSearchQuery}
                                     inputMode='text'

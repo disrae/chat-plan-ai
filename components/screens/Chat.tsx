@@ -3,11 +3,60 @@ import { View, Text, TextInput, Pressable, FlatList, KeyboardAvoidingView, Platf
 import { useRouter } from 'expo-router';
 import { AntDesign, EvilIcons, FontAwesome } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
-import { useQuery, useMutation, Id, useAction } from 'convex/react';
+import { useQuery, useMutation, useAction } from 'convex/react';
 import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
 import { ShareInfo } from '../popups/ShareInfo';
 import { Popup } from '../utils/Popup';
 import { colors } from '@/constants/Colors';
+import { Language, useLocale } from '@/hooks/useLocale';
+
+const translations: Record<Language, Record<string, string>> = {
+    'en-ca': {
+        generateSummary: 'Generate Summary',
+        generating: 'Generating...',
+        shareChat: 'Share Chat',
+        summaryTitle: 'Generate Summary',
+        summaryPrompt: 'Would you like to provide a prompt for the summary? (Optional)',
+        summaryPlaceholder: 'E.g., Focus on project timeline and key deliverables...',
+        cancel: 'Cancel',
+        generate: 'Generate',
+        typeMessage: 'Type a message'
+    },
+    'fr-ca': {
+        generateSummary: 'Générer un résumé',
+        generating: 'Génération...',
+        shareChat: 'Partager la conversation',
+        summaryTitle: 'Générer un résumé',
+        summaryPrompt: 'Voulez-vous fournir des instructions pour le résumé? (Optionnel)',
+        summaryPlaceholder: 'Ex: Se concentrer sur le calendrier du projet et les livrables clés...',
+        cancel: 'Annuler',
+        generate: 'Générer',
+        typeMessage: 'Tapez un message'
+    },
+    'es-mx': {
+        generateSummary: 'Generar resumen',
+        generating: 'Generando...',
+        shareChat: 'Compartir chat',
+        summaryTitle: 'Generar resumen',
+        summaryPrompt: '¿Desea proporcionar instrucciones para el resumen? (Opcional)',
+        summaryPlaceholder: 'Ej: Centrarse en el cronograma del proyecto y los entregables clave...',
+        cancel: 'Cancelar',
+        generate: 'Generar',
+        typeMessage: 'Escribe un mensaje'
+    },
+    'ro-ro': {
+        generateSummary: 'Generează rezumat',
+        generating: 'Se generează...',
+        shareChat: 'Partajează conversația',
+        summaryTitle: 'Generează rezumat',
+        summaryPrompt: 'Doriți să oferiți instrucțiuni pentru rezumat? (Opțional)',
+        summaryPlaceholder: 'Ex: Concentrați-vă pe cronologia proiectului și livrabilele cheie...',
+        cancel: 'Anulează',
+        generate: 'Generează',
+        typeMessage: 'Scrie un mesaj'
+    }
+};
 
 type ChatScreenProps = {
     conversationId: Id<'conversations'>;
@@ -34,6 +83,8 @@ export function ChatScreen({ conversationId, isBusinessOwner, onBackPress }: Cha
     const generateSummary = useAction(api.ai.generateSummary);
     const [isSummarizing, setIsSummarizing] = useState(false);
     const router = useRouter();
+    const { locale } = useLocale();
+    const t = translations[locale] ?? translations['en-ca'];
 
     useEffect(() => {
         if (flatListRef.current && messages) {
@@ -110,14 +161,14 @@ export function ChatScreen({ conversationId, isBusinessOwner, onBackPress }: Cha
                 {modal.type === 'generate-summary' && (
                     <Popup onClose={() => setModal({ type: '' })}>
                         <View className="p-6">
-                            <Text className="text-xl font-bold mb-4">Generate Summary</Text>
+                            <Text className="text-xl font-bold mb-4">{t.summaryTitle}</Text>
                             <Text className="text-gray-600 mb-4">
-                                Would you like to provide a prompt for the summary? (Optional)
+                                {t.summaryPrompt}
                             </Text>
                             <TextInput
                                 className="border border-gray-300 rounded p-2 mb-4 min-h-[100px]"
                                 multiline
-                                placeholder="E.g., Focus on project timeline and key deliverables..."
+                                placeholder={t.summaryPlaceholder}
                                 placeholderTextColor="#aaa"
                                 onChangeText={(text) => setModal(prev => ({
                                     ...prev,
@@ -129,12 +180,12 @@ export function ChatScreen({ conversationId, isBusinessOwner, onBackPress }: Cha
                                 <Pressable
                                     className="px-4 py-2 rounded"
                                     onPress={() => setModal({ type: '' })}>
-                                    <Text>Cancel</Text>
+                                    <Text>{t.cancel}</Text>
                                 </Pressable>
                                 <Pressable
                                     className="bg-primary px-4 py-2 rounded"
                                     onPress={() => handleGenerateSummary(modal.payload?.customerPrompt)}>
-                                    <Text className="text-white">Generate</Text>
+                                    <Text className="text-white">{t.generate}</Text>
                                 </Pressable>
                             </View>
                         </View>
@@ -165,7 +216,7 @@ export function ChatScreen({ conversationId, isBusinessOwner, onBackPress }: Cha
                                             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
                                             <FontAwesome name="file-text-o" size={16} color="black" />
                                             <Text className='text font-medium text-right ml-1'>
-                                                {isSummarizing ? 'Generating...' : 'Generate Summary'}
+                                                {isSummarizing ? t.generating : t.generateSummary}
                                             </Text>
                                         </Pressable>
                                         <View className='w-2' />
@@ -175,7 +226,7 @@ export function ChatScreen({ conversationId, isBusinessOwner, onBackPress }: Cha
                                             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
                                             <EvilIcons name="link" size={20} color="black" />
                                             <Text className='text font-medium text-right ml-1'>
-                                                Share Chat
+                                                {t.shareChat}
                                             </Text>
                                         </Pressable>
                                     </View>
@@ -217,7 +268,7 @@ export function ChatScreen({ conversationId, isBusinessOwner, onBackPress }: Cha
                         <View className='flex-row items-center'>
                             <TextInput
                                 className='flex-1 text-slate-800 border border-gray-400 rounded p-2 tracking-tighter focus:border-primary focus:outline-primary'
-                                placeholder="Type a message"
+                                placeholder={t.typeMessage}
                                 value={newMessage}
                                 onChangeText={setNewMessage}
                                 multiline={true}
