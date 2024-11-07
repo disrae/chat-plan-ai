@@ -136,9 +136,9 @@ export function ChatScreen({ conversationId, isBusinessOwner, onBackPress }: Cha
                 }
             });
             if (isBusinessOwner && conversation) {
-                router.push(`/${conversation.businessName}/${conversation.projectName}/${conversationId}/summary`);
+                router.push(`/${locale}/${conversation.businessName}/${conversation.projectName}/${conversationId}/summary`);
             } else {
-                router.push(`/conversations/${conversationId}/summary`);
+                router.push(`/${locale}/conversations/${conversationId}/summary`);
             }
         } catch (error) {
             console.error("Failed to generate summary:", error);
