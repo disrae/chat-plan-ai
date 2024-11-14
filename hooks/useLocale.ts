@@ -1,7 +1,7 @@
 import { useLocalSearchParams } from 'expo-router';
 
 export type Language = typeof locales[number]['code'];
-const locales = [
+export const locales = [
     { code: 'en-ca', name: 'English', flag: '🇨🇦' },
     { code: 'fr-ca', name: 'Français', flag: '🇨🇦' },
     { code: 'en-us', name: 'English', flag: '🇺🇸' },

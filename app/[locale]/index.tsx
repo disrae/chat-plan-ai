@@ -6,12 +6,14 @@ import { SignUp } from "@/components/popups/SignUp";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAuthActions } from "@convex-dev/auth/dist/react";
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Fontisto from '@expo/vector-icons/Fontisto';
-import { Language, useLocale } from "@/hooks/useLocale";
+import { Language, locales, useLocale } from "@/hooks/useLocale";
 
-const translations: Record<Language, Record<string, unknown>> = {
+type TranslationType = typeof translations['en-ca'];
+
+const translations = {
     'en-ca': {
         signIn: 'Sign In',
         signUp: 'Sign Up',
@@ -139,7 +141,7 @@ export default function HomePage() {
     const isAndroid = Platform.OS === 'android';
     const [popup, setPopup] = useState<{ type: 'language' | ''; }>({ type: '' });
     const { locale } = useLocale();
-    const t = translations[locale];
+    const t = translations[locale as keyof typeof translations] as TranslationType;
 
     useEffect(() => {
         if (!user) { return; }
@@ -194,7 +196,7 @@ export default function HomePage() {
                                 <View className='p-3 border-b border-gray-400 rounded-t'>
                                     <Text className="font-bold text-lg">{t.selectLanguage}</Text>
                                 </View>
-                                {languages.map((lang) => (
+                                {locales.map((lang) => (
                                     <Pressable
                                         key={lang.code}
                                         onPress={() => {
