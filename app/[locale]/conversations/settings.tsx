@@ -68,11 +68,13 @@ const translations: Record<Language, Record<string, string>> = {
     }
 };
 
+const tabs = ['profile', 'notifications'] as const;
+
 export default function AccountSettings() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const user = useQuery(api.users.currentUser);
-    const [tab, setTab] = useState<'profile' | 'notifications'>('profile');
+    const [tab, setTab] = useState<'profile' | 'notifications' | 'projects'>('profile');
     const [isUpdating, setIsUpdating] = useState(false);
     const { successMessage, errorMessage, setSuccessMessage, setErrorMessage, clearMessages } = useStore();
     const updateUser = useMutation(api.users.updateUser);
@@ -142,28 +144,31 @@ export default function AccountSettings() {
                 <ScrollView className='w-full max-w-2xl px-'>
                     {/* Tabs */}
                     <View className="flex-row">
-                        <Pressable
-                            className={`py-4 px-4 rounded-tl-lg ${tab === 'profile' ? 'bg-white' : 'bg-gray-200'}`}
-                            onPress={() => setTab('profile')}
-                        >
-                            <Text
-                                className={`${tab === 'profile' ? 'text-black' : 'text-gray-500'} font-bold text-base`}>
-                                {t.profile}
-                            </Text>
-                        </Pressable>
-                        <Pressable
-                            className={`py-4 px-4 rounded-tr-lg ${tab === 'notifications' ? 'bg-white' : 'bg-gray-200'}`}
-                            onPress={() => setTab('notifications')}
-                        >
-                            <Text className={`${tab === 'notifications' ? 'text-black' : 'text-gray-500'} font-bold text-base`}>
-                                {t.notifications}
-                            </Text>
-                        </Pressable>
+                        {tabs.map((tabName, index) => (
+                            <Pressable
+                                key={tabName}
+                                className={`py-4 px-6 ${index === 0 ? 'rounded-tl-lg' : 'rounded-tr-lg'} 
+                                ${tab === tabName ? 'bg-white border-t border-l border-r border-gray-200 border-b-0' : 'bg-gray-100 border-b border-gray-200'}
+                                hover:bg-opacity-90 active:bg-opacity-80 transition-all duration-200
+                                ${tab !== tabName && 'hover:bg-gray-200'}`}
+                                onPress={() => setTab(tabName)}
+                            >
+                                <View className="flex-row items-center space-x-2">
+                                    {tabName === 'profile' && <AntDesign name="user" size={16} color={tab === tabName ? '#000' : '#6B7280'} />}
+                                    {tabName === 'notifications' && <AntDesign name="bells" size={16} color={tab === tabName ? '#000' : '#6B7280'} />}
+                                    <Text
+                                        className={`${tab === tabName ? 'text-black' : 'text-gray-500'} font-bold text-base
+                                        group-hover:opacity-90 transition-opacity duration-200`}>
+                                        {t[tabName]}
+                                    </Text>
+                                </View>
+                            </Pressable>
+                        ))}
                     </View>
 
                     {/* Profile */}
                     {tab === 'profile' &&
-                        <View className="bg-white rounded-lg rounded-tl-none p-4 ">
+                        <View className="bg-white rounded-b-lg rounded-tr-lg p-4 border-gray-200 border-l border-r border-b">
                             {/* Section Title */}
                             <Text className="text-lg font-bold mb-2">{t.profileInformation}</Text>
                             <Text className="text-sm text-gray-600 mb-4">{t.updateAccountDetails}</Text>
@@ -189,7 +194,7 @@ export default function AccountSettings() {
                         </View>}
                     {/* Notifications */}
                     {tab === 'notifications' &&
-                        <View className="bg-white rounded-lg p-4 ">
+                        <View className="bg-white rounded-b-lg p-4 border-gray-200 border-l border-r border-b">
                             {/* Section Title */}
                             <Text className="text-lg font-bold mb-2">{t.notifications}</Text>
                             <Text className="text-sm text-gray-600 mb-4">{t.notificationsPreferences}</Text>
