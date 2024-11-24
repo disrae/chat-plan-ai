@@ -9,10 +9,9 @@ import { useAuthActions } from "@convex-dev/auth/dist/react";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Fontisto from '@expo/vector-icons/Fontisto';
-import { Language, locales, useLocale } from "@/hooks/useLocale";
+import { locales, useLocale } from "@/hooks/useLocale";
 
 type TranslationType = typeof translations['en-ca'];
-
 const translations = {
     'en-ca': {
         signIn: 'Sign In',

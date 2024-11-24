@@ -23,7 +23,12 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/icon_web/icon_circle_c.png",
+        "backgroundColor": "#ffffff"
+      },
+      "splash": {
+        "image": "./assets/icon_web/icon_circle_c.png",
+        "resizeMode": "contain",
         "backgroundColor": "#ffffff"
       },
       "package": "com.disrae.chatplanai"
