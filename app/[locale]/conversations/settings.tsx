@@ -67,7 +67,6 @@ const translations: Record<Language, Record<string, string>> = {
         profileUpdateError: 'Actualizarea profilului a eșuat. Vă rugăm să încercați din nou.'
     }
 };
-
 const tabs = ['profile', 'notifications'] as const;
 
 export default function AccountSettings() {

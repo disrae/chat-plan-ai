@@ -87,12 +87,15 @@ export default function AccountSettings() {
     const user = useQuery(api.users.currentUser);
     const [tab, setTab] = useState<'profile' | 'projects' | 'notifications'>('profile');
     const [isUpdating, setIsUpdating] = useState(false);
+    const dashboard = useQuery(api.users.getUserDashboardData);
+    const business = dashboard?.businesses?.[0];
     const { successMessage, errorMessage, setSuccessMessage, setErrorMessage, clearMessages } = useStore();
     const updateUser = useMutation(api.users.updateUser);
     let timer: NodeJS.Timeout | null = null;
     const { locale } = useLocale();
     const t = translations[locale] ?? translations['en-ca'];
 
+    console.log(JSON.stringify(business, null, 2));
     const handleBack = () => {
         if (!user) return;
         if (router.canGoBack()) return router.back();
